@@ -1,0 +1,62 @@
+spring:
+  application:
+   name: dbnotify
+  profiles:
+    active: dev
+    
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: "jdbc:mysql://192.168.1.200:3306/flowplatform?useUnicode=true&characterEncoding=utf8"
+    #url: "jdbc:mysql://support.shziyuan.cn:53306/flowplatform?useUnicode=true&characterEncoding=utf8"
+    username: flowplatform
+    password: 940430Dex
+    
+  cloud:
+    config:
+      uri: http://config-server:8762
+      profile: prod
+
+eureka:
+ client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka/
+#server:
+#  port: 8772
+
+logging:
+  path: /tmp/db-notify
+
+
+db:
+  js:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: "jdbc:mysql://support.shziyuan.cn:53307/jsunicom?useUnicode=true&characterEncoding=utf8"
+    username: flowplatform
+    password: 940430Dex
+    initial-size: 1
+    max-active: 1
+    validation-query: select 1
+  cc:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: "jdbc:mysql://support.shziyuan.cn:53306/flowplatform?useUnicode=true&characterEncoding=utf8"
+    username: flowplatform
+    password: 940430Dex
+    initial-size: 1
+    max-active: 1
+    validation-query: select 1
+  js-read:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: "jdbc:mysql://192.168.1.200:3306/jsunicom?useUnicode=true&characterEncoding=utf8"
+    username: flowplatform
+    password: 940430Dex
+    initial-size: 1
+    max-active: 1
+    validation-query: select 1
+  cc-read:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: "jdbc:mysql://support.shziyuan.cn:53308/flowplatform?useUnicode=true&characterEncoding=utf8"
+    username: flowplatform
+    password: 940430Dex
+    initial-size: 1
+    max-active: 1
+    validation-query: select 1

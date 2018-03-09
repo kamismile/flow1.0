@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.shziyuan.flow</groupId>
+	<artifactId>maven-base</artifactId>
+	<version>1.0.0</version>
+	<packaging>pom</packaging>
+
+	<name>Flow-MavenBase</name>
+	<description>FlowPlatform Maven base depends</description>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.9.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<spring-cloud.version>Edgware.RELEASE</spring-cloud.version>
+		<flow.version>0.0.1</flow.version>
+		<druid.version>1.1.6</druid.version>
+		
+		<docker.common.path>/Users/yaohu/Documents/gitRepository/FlowPlatform2/Flow-MavenBase/dockerbuild</docker.common.path>
+		
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.shziyuan.flow.global</groupId>
+			<artifactId>Sub-Common</artifactId>
+			<version>${flow.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			
+			<!-- https://mvnrepository.com/artifact/com.alibaba/druid -->
+			<dependency>
+			    <groupId>com.alibaba</groupId>
+			    <artifactId>druid</artifactId>
+			    <version>${druid.version}</version>
+			</dependency>
+						
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			
+		</plugins>
+		
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>deploy</id>
+							<phase>package</phase>
+							<goals>
+								<goal>run</goal>
+							</goals>
+							<configuration>
+								<target>
+									<property name="servicemix_path" value="${basedir}/docker" />
+									<property name="target_file"
+										value="${project.artifactId}-${project.version}.jar" />
+									<echo message="servicemix_path: ${servicemix_path}" />
+									<echo message="file: ${target_file}" />
+									<!-- <delete file="${servicemix_path}/${target_file}"></delete>
+									<delete file="${servicemix_path}/dockerfile"></delete>
+									<delete file="${servicemix_path}/Shanghai"></delete>
+									<delete file="${servicemix_path}/buildDocker.sh"></delete>
+									<copy file="${project.build.directory}/${target_file}" todir="${servicemix_path}/" />
+									<copy file="${docker.common.path}/dockerfile" todir="${servicemix_path}/" />
+									<copy file="${docker.common.path}/Shanghai" todir="${servicemix_path}/" />
+									<copy file="${docker.common.path}/buildDocker.sh" todir="${servicemix_path}/" /> -->
+									
+									<copy todir="${servicemix_path}" overwrite="true">
+										<fileset dir="${docker.common.path}" />
+									</copy>
+									<delete file="${servicemix_path}/${target_file}" />
+									<copy file="${project.build.directory}/${target_file}" todir="${servicemix_path}" overwrite="true"/>
+									
+									
+									<replace file ="${servicemix_path}/dockerfile">
+									<replacefilter token="@target_file@" value="${target_file}"/>
+									<replacefilter token="@port@" value="${server.port}"/>
+									<replacefilter token="@java_cmd_param@" value="${spring.config.location}"/>
+									</replace>
+									<replace file ="${servicemix_path}/buildDocker.sh">
+									<replacefilter token="@target_file@" value="${project.artifactId}"/>
+									<replacefilter token="@version@" value="${project.version}"/>
+									
+									</replace>
+								</target>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

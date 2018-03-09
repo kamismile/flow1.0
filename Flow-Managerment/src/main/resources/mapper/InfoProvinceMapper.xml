@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.InfoProvinceMapper">
+	<!-- 分页查询产品信息 -->
+	<select id="select" resultType="com.ziyuan.web.manager.domain.InfoProvinceBean" >
+		select * from info_province
+	</select>
+	
+</mapper>

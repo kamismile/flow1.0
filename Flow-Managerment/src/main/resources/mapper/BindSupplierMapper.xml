@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ziyuan.web.manager.dao.BindSupplierMapper">
+	<resultMap id="BaseResultMap" type="com.ziyuan.web.manager.domain.BindSupplierBean" >
+		<id column="id" property="id" />
+	    <result column="provinceid" property="provinceid" />
+	    <result column="operator" property="operator" />
+	    <result column="scope_cid" property="scope_cid" />
+	    <result column="code" property="code" />
+	    <result column="name" property="name" />
+	    <result column="discount" property="discount" />
+	    <result column="price" property="price" />
+	    <result column="enabled" property="enabled" />
+	    <result column="info_ptype" property="info_ptype" />
+	    <result column="rent_type" property="rent_type" />
+	    <result column="province" property="province" />
+	    <result column="scope_name" property="scope_name" />
+	    
+		<association property="bind" javaType="bindSupplier">
+			<id column="bind_id" property="id" />
+		    <result column="bind_enabled" property="enabled" />
+		    <result column="bind_sorting" property="sorting" />
+		</association>
+		<association property="supplier" javaType="infoSupplier">
+			<id column="supplier_id" property="id" />
+		    <result column="supplier_name" property="name" />
+		    <result column="supplier_enabled" property="enabled" />
+		</association>
+	</resultMap>
+	
+	<resultMap id="bindResultMap" type="com.ziyuan.web.manager.domain.BindSupplierListBean" >
+		<id column="bind_id" property="id" />
+	    <result column="bind_enabled" property="enabled" />
+	    <result column="bind_sorting" property="sorting" />
+	    
+	    <result column="province" property="province" />
+	    <result column="scope_name" property="scope_name" />
+	    
+	    <association property="codetable" javaType="infoSupplierCodetable">
+	    	<id column="id" property="id" />
+		    <result column="provinceid" property="provinceid" />
+		    <result column="operator" property="operator" />
+		    <result column="scope_cid" property="scope_cid" />
+		    <result column="code" property="code" />
+		    <result column="name" property="name" />
+		    <result column="discount" property="discount" />
+		    <result column="price" property="price" />
+		    <result column="enabled" property="enabled" />
+	    </association>
+	    <association property="supplier" javaType="infoSupplier">
+			<id column="supplier_id" property="id" />
+		    <result column="supplier_name" property="name" />
+		    <result column="supplier_enabled" property="enabled" />
+		</association>
+		<association property="sku" javaType="infoSku">
+			<result column="sku_sku" property="sku" />
+			<result column="sku_name" property="name" />
+		    <result column="sku_standard_price" property="standard_price" />
+		    <result column="sku_enabled" property="enabled" />
+		</association>
+	</resultMap>
+		
+	<select id="select" resultMap="bindResultMap" parameterType="map">
+		select bind.id bind_id,bind.enabled bind_enabled,bind.sorting bind_sorting,
+		sp.name supplier_name,sp.id supplier_id,sp.enabled supplier_enabled,
+		ct.id,ct.provinceid,ct.operator,ct.scope_cid,ct.code,ct.name,ct.discount,ct.price,ct.enabled,
+	    vp.province,ic.name scope_name,sku.sku sku_sku,sku.name sku_name,sku.standard_price sku_standard_price,sku.enabled sku_enabled
+		from bind_supplier bind
+		inner join info_sku sku on bind.sku_id=sku.id
+		inner join info_supplier_codetable ct on bind.supplier_code_id=ct.id
+		inner join info_supplier sp on bind.supplier_id=sp.id
+		left join info_province vp on ct.provinceid=vp.provinceid
+		left join info_constant ic on ct.scope_cid=ic.id
+		<where>
+			<if test="skuName!=null ">
+				sku.name like '%${skuName}%'
+			</if>
+			<if test="provinceid!=null ">
+				AND ct.provinceid=#{provinceid}
+			</if>
+			<if test="operator != null">
+				AND ct.operator=#{operator}
+			</if>
+			<if test="scope_cid != null">
+				AND ct.scope_cid=#{scope_cid}
+			</if>
+			<if test="enabled != null">
+				AND ct.enabled=#{enabled}
+			</if>
+			<if test="alias != null">
+				<if test="name != null">
+					and ${alias}.name like '%${name}%'
+				</if>
+				<if test="supplier_id != null">
+					and bind.supplier_id=#{supplier_id}
+				</if>
+				<if test="operator != null">
+					and ${alias}.operator=#{operator}
+				</if>
+				<if test="scope_cid != null">
+					and ${alias}.scope_cid=#{scope_cid}
+				</if>
+				<if test="provinceid != null">
+					and ${alias}.provinceid=#{provinceid}
+				</if>
+			</if>
+		</where>
+		order by sku.sku,sp.id,ct.operator,ct.provinceid
+	</select>
+	
+	<select id="selectBindedSorting" resultMap="bindResultMap" parameterType="map">
+		select bind.id bind_id,bind.enabled bind_enabled,bind.sorting bind_sorting,
+		sp.name supplier_name,sp.id supplier_id,sp.enabled supplier_enabled,
+		ct.id,ct.provinceid,ct.operator,ct.scope_cid,ct.code,ct.name,ct.discount,ct.price,ct.enabled,
+	    sku.sku sku_sku,sku.standard_price sku_standard_price,sku.enabled sku_enabled
+		from bind_supplier bind
+		inner join info_sku sku on bind.sku_id=sku.id
+		inner join info_supplier_codetable ct on bind.supplier_code_id=ct.id
+		inner join info_supplier sp on bind.supplier_id=sp.id
+        where bind.sku_id=#{sku_id} order by bind.sorting
+	</select>
+	
+	<select id="selectCodetable" resultMap="BaseResultMap" parameterType="map">
+		select bind.id bind_id,bind.enabled bind_enabled,bind.sorting bind_sorting,
+		sp.name supplier_name,sp.id supplier_id,sp.enabled supplier_enabled,
+		ct.id,ct.provinceid,ct.operator,ct.scope_cid,ct.code,ct.name,ct.discount,ct.price,ct.enabled,
+	    vp.province,ic.name scope_name,ct.info_ptype,ct.rent_type
+	    from info_supplier_codetable ct
+	    left join bind_supplier bind on bind.supplier_code_id=ct.id and bind.sku_id=#{sku_id}
+	    left join info_supplier sp on ct.supplier_id=sp.id
+	    left join info_province vp on ct.provinceid=vp.provinceid
+		left join info_constant ic on ct.scope_cid = ic.id
+		<where>
+			ct.provinceid=#{sku_provinceid} and ct.operator=#{sku_operator} and ct.pkgsize=#{sku_pkgsize} and ct.code_type=#{sku_type}
+			<if test="name!=null ">
+				AND ct.name like '%${name}%'
+			</if>
+			<if test="provinceid!=null ">
+				AND ct.provinceid=#{provinceid}
+			</if>
+			<if test="operator != null and operator!=''">
+				AND ct.operator=#{operator}
+			</if>
+			<if test="scope_cid != null">
+				AND ct.scope_cid=#{scope_cid}
+			</if>
+			<if test="supplierName != null">
+				AND sp. NAME=#{supplierName}
+			</if>
+			<if test="supplierID != null">
+				AND sp.id = #{supplierID}
+			</if>
+			<if test="enabled != null">
+				AND ct.enabled=#{enabled}
+			</if>
+		</where>
+		<if test="sort == 'id'">
+		order by bind.id ${order}
+		</if>
+		<if test="sort == 'code'">
+		order by ct.code ${order}
+		</if>
+		<if test="sort == 'province'">
+		order by ct.provinceid ${order}
+		</if>
+		<if test="sort == 'operator'">
+		order by ct.operator ${order}
+		</if>
+		<if test="sort == 'scope_name'">
+		order by ct.scope_cid ${order}
+		</if>
+	</select>
+	<!-- 绑定供应商产品 -->
+	<insert id="insert" parameterType="bindSupplier" >
+		insert into bind_supplier(sku_id,pkg_id,supplier_id,supplier_code_id,enabled,sorting)
+		values(#{sku_id},#{pkg_id},#{supplier_id},#{supplier_code_id},#{enabled},#{sorting})
+	</insert>
+		
+	<update id="update" parameterType="bindSupplier">
+		update bind_supplier
+		<set>
+		<if test="sorting != null">sorting=#{sorting}</if>
+		<if test="enabled != null">,enabled=#{enabled}</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="bindSupplier">
+		delete from bind_supplier where id=#{id};
+	</delete>
+	<delete id="deleteBySkuId" parameterType="int">
+		delete from bind_supplier where sku_id=#{sku_id}
+	</delete>
+	
+	<!-- 树形筛选 -->
+	<resultMap type="com.ziyuan.web.manager.domain.TreeBindBean" id="treeBySupplierMap">
+		<id column="id" property="id" />
+		<result column="name" property="name"/>
+		<collection property="childs" ofType="com.ziyuan.web.manager.domain.TreeBindBean">
+			<id column="provinceid" property="id" />
+			<result column="province" property="name"/>
+			<collection property="childs" ofType="com.ziyuan.web.manager.domain.TreeBindBean">
+				<id column="scope_cid" property="id"/>
+				<result column="scope_name" property="name" />
+				<result column="discount_min" property="discount_min"/>
+				<result column="count" property="count"/>
+			</collection>
+		</collection>
+	</resultMap>
+	<select id="selectTreeBySupplier" resultMap="treeBySupplierMap">
+		select sp.id,sp.name,bind.provinceid,pv.province,
+			bind.scope_cid,ic.name scope_name,bind.discount_min,bind.count from(
+		select sp.id supplier_id,ct.provinceid,ct.scope_cid,min(ct.discount) discount_min,count(ct.id) count
+		from info_supplier_codetable ct 
+		inner join info_supplier sp on ct.supplier_id=sp.id
+		group by sp.id,ct.provinceid,ct.scope_cid ) bind
+		left join info_supplier sp on bind.supplier_id=sp.id
+		left join info_province pv on bind.provinceid=pv.provinceid
+		left join info_constant ic on bind.scope_cid=ic.id
+		order by sp.id,bind.provinceid
+	</select>
+	<select id="selectTreeBySku" resultMap="treeBySupplierMap">
+		select sku.id,sku.sku name,sku.provinceid,pv.province,
+			bind.scope_cid,ic.name scope_name,bind.discount_min,bind.count from(
+		select sku.id sku_id,sku.provinceid,sku.scope_cid,min(sku.standard_price) discount_min,count(sku.id) count
+		from bind_supplier bind
+		inner join info_sku sku on bind.sku_id=sku.id
+		group by sku.id,sku.provinceid,sku.scope_cid ) bind
+		left join info_sku sku on bind.sku_id=sku.id
+		left join info_province pv on bind.provinceid=pv.provinceid
+		left join info_constant ic on bind.scope_cid=ic.id
+		order by sku.id,sku.provinceid
+	</select>
+	
+	<!-- 重置 获取渠道bind表 -->
+	<resultMap id="bindMap2" type="com.ziyuan.web.manager.domain.BindSupplierBean2" >
+		<id column="id" property="id" />
+		<result column="sorting" property="sorting" />
+		<result column="enabled" property="enabled" />
+		
+		<association property="codetable" javaType="infoSupplierCodetable">
+			<id column="supplier_code_id" property="id"/>
+			<result column="ct_provinceid" property="provinceid"/>
+			<result column="ct_operator" property="operator"/>
+			<result column="ct_scope_cid" property="scope_cid"/>
+			<result column="ct_code" property="code"/>
+			<result column="ct_name" property="name"/>
+			<result column="ct_discount" property="discount"/>
+			<result column="ct_price" property="price"/>
+			<result column="ct_enabled" property="enabled"/>
+			<result column="ct_pkgsize" property="pkgsize"/>
+			<result column="ct_info_ptype" property="info_ptype"/>
+			<result column="ct_cache_mode" property="cache_mode"/>
+			<result column="ct_info_net" property="info_net"/>
+			<result column="ct_rent_type" property="rent_type"/>
+		</association>
+		<association property="supplier" javaType="infoSupplier">
+			<id column="supplier_id" property="id"/>
+			<result column="sup_name" property="name"/>
+		</association>
+	</resultMap>
+	<resultMap id="bindMapNonBind2" type="com.ziyuan.web.manager.domain.InfoSupplierCodetableBean" >
+		<id column="id" property="id"/>
+		<result column="provinceid" property="provinceid"/>
+		<result column="operator" property="operator"/>
+		<result column="scope_cid" property="scope_cid"/>
+		<result column="code" property="code"/>
+		<result column="name" property="name"/>
+		<result column="discount" property="discount"/>
+		<result column="price" property="price"/>
+		<result column="enabled" property="enabled"/>
+		<result column="pkgsize" property="pkgsize"/>
+		<result column="info_ptype" property="info_ptype"/>
+		<result column="cache_mode" property="cache_mode"/>
+		<result column="info_net" property="info_net"/>
+		<result column="rent_type" property="rent_type"/>
+		<association property="supplier" javaType="infoSupplier">
+			<id column="supplier_id" property="id"/>
+			<result column="sup_name" property="name"/>
+		</association>
+	</resultMap>
+	
+	<select id="selectBind2_binded" parameterType="map" resultMap="bindMap2">
+		select sup.name sup_name,bind.*,
+		ct.id ct_id,ct.provinceid ct_provinceid,ct.operator ct_operator,ct.scope_cid ct_scope_cid,
+		ct.code ct_code,ct.name ct_name,ct.discount ct_discount,ct.price ct_price,ct.enabled ct_enabled,
+		ct.pkgsize ct_pkgsize,ct.info_ptype ct_info_ptype,ct.info_net ct_info_net,ct.rent_type ct_rent_type,ct.cache_mode ct_cache_mode
+		from bind_supplier bind left join info_supplier_codetable ct on bind.supplier_code_id=ct.id
+		left join info_supplier sup on ct.supplier_id=sup.id
+		where bind.sku_id=#{sku_id}
+		order by bind.sorting
+	</select>
+	
+	<select id="selectBind2_nonbinded" parameterType="map" resultMap="bindMapNonBind2">
+		select sup.id sup_id,sup.name sup_name,ct.*
+		from info_supplier_codetable ct left join bind_supplier bind on bind.supplier_code_id=ct.id and bind.sku_id=#{sku_id}
+		left join info_supplier sup on ct.supplier_id=sup.id
+		<where>
+			bind.id is null
+			<if test="provinceid != null">
+				and ct.provinceid=#{provinceid}
+			</if>
+			<if test="operator != null">
+				and ct.operator=#{operator}
+			</if>
+			<if test="scope_cid != null">
+				and ct.scope_cid=#{scope_cid}
+			</if>
+			<if test="pkgsize != null">
+				and ct.pkgsize=#{pkgsize}
+			</if>
+			<if test="info_ptype != null">
+				and ct.info_ptype=#{info_ptype}
+			</if>
+			<if test="info_net != null">
+				and ct.info_net=#{info_net}
+			</if>
+			<if test="rent_type != null">
+				and ct.rent_type=#{rent_type}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 查询View -->
+	<resultMap id="viewMap" type="infoSupplierBinded">
+		<id column="s_id" property="id" />
+		<result column="s_name" property="name" />
+		<result column="s_report_mode" property="report_mode" />
+		<result column="s_process_mode" property="process_mode" />
+		<result column="s_if_attribute" property="if_attribute" />
+		<result column="s_pclass" property="pclass" />
+		<result column="s_cache_mode" property="cache_mode" />
+		<result column="s_platform_mark" property="platform_mark" />
+	<!-- 
+		<association property="supplierCode" javaType="infoSupplierCodetable">
+			<id column="sc_id" property="id" />
+			<result column="sc_provinceid" property="provinceid" />
+			<result column="sc_operator" property="operator" />
+			<result column="sc_scope_cid" property="scope_cid" />
+			<result column="sc_code" property="code" />
+			<result column="sc_via_attribute" property="via_attribute" />
+			<result column="sc_name" property="name" />
+			<result column="sc_discount" property="discount" />
+			<result column="sc_price" property="price" />
+			<result column="sc_if_attribute" property="if_attribue" />
+			<result column="sc_cache_mode" property="cache_mode" />
+		</association>
+	 -->
+		<association property="bind" javaType="bindSupplier">
+			<id column="bind_id" property="id" />
+			<result column="bind_sorting" property="sorting" />
+		</association>
+	
+	</resultMap>
+	<select id="selectByOrder" parameterType="map" resultMap="viewMap">
+		select * from view_bind_supplier where s_id=#{supplier_id} and bind_sku_id=#{sku_id}
+	</select>
+	
+	<select id="checkNull" resultType="int">
+		SELECT
+			count(0)
+		FROM
+			bind_supplier bind
+		LEFT JOIN info_supplier su ON bind.supplier_id = su.id
+		LEFT JOIN info_sku sku ON bind.sku_id = sku.id
+		LEFT JOIN info_supplier_codetable co ON bind.supplier_code_id = co.id
+		WHERE
+			su.id IS NULL
+		OR sku.id IS NULL
+		OR bind.sku_id = 0
+		OR bind.supplier_code_id = 0
+		OR co.id is NULL
+	</select>
+	
+	<select id="checkRepetion" resultType="int">
+		SELECT
+			count(0)
+		FROM
+			bind_supplier
+		WHERE
+			(
+				SELECT
+					count(0)
+				FROM
+					bind_supplier b
+				WHERE
+					bind_supplier.sku_id = b.sku_id
+				AND bind_supplier.supplier_code_id = b.supplier_code_id
+			) > 1
+	</select>
+	
+	<select id="selectById" resultType="com.shziyuan.flow.global.domain.flow.BindSupplier" parameterType="int">
+		SELECT
+			*
+		FROM
+			bind_supplier
+		WHERE
+			id = #{id}
+	</select>
+	
+	<select id="selectBySkuId" resultType="com.shziyuan.flow.global.domain.flow.BindSupplier" parameterType="int">
+		SELECT
+			*
+		FROM
+			bind_supplier
+		WHERE
+			sku_id = #{sku_id}
+	</select>
+	
+	<update id="updateSortingById" parameterType="com.shziyuan.flow.global.domain.flow.BindSupplier">
+	UPDATE 
+		bind_supplier
+	SET 
+		sorting = #{sorting}
+	WHERE
+		id = #{id}
+	</update>
+</mapper>

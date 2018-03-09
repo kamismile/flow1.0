@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>notification-service</artifactId>
+	<packaging>jar</packaging>
+
+	<name>Flow-NotificationServer</name>
+	<description>FlowPlatform Notification Service</description>
+
+	<parent>
+		<groupId>com.shziyuan.flow</groupId>
+		<artifactId>maven-base</artifactId>
+		<version>1.0.0</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<mail.version>1.5.0-b01</mail.version>
+		<server.port>8764</server.port>
+		<skipTests>true</skipTests>
+	</properties>
+
+	<dependencies>
+		
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-feign</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>javax.mail</groupId>
+		    <artifactId>mail</artifactId>
+		    <version>${mail.version}</version>
+		</dependency>
+		
+		<!-- 安装到阿里云第三方sdk 到本地maven仓库
+		mvn install:install-file -Dfile=aliyun-java-sdk-core-3.3.1.jar -DgroupId=com.aliyun.sdk -DartifactId=core -Dversion=3.3.1 -Dpackaging=jar
+		 -->
+		<dependency>
+			<groupId>com.aliyun.sdk</groupId>
+			<artifactId>core</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+		
+		<!-- mvn install:install-file -Dfile=aliyun-java-sdk-dysmsapi-1.0.0.jar -DgroupId=com.aliyun.sdk -DartifactId=dysmsapi -Dversion=1.0.0 -Dpackaging=jar -->
+		<dependency>
+			<groupId>com.aliyun.sdk</groupId>
+			<artifactId>dysmsapi</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>

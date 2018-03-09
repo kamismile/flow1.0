@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.AccountDistributorMapper" >
+	
+	<!-- 新增供应商统计数据-->
+	<insert id="addAccountDistributor" parameterType="Integer">
+		insert into account_distributor(distributor_id) values (#{id})
+	</insert>
+	
+	<select id="selectOne" resultType="com.ziyuan.web.manager.domain.AccountDistributorBean" parameterType="Integer">
+		select * from account_distributor where distributor_id=#{id}
+	</select>
+	
+	<update id="lockByAccounting">
+		lock tables account_distributor write,pending_account_distributor write
+	</update>
+	<update id="unlockByAccounting">
+		unlock tables 
+	</update>
+	
+	<update id="update" parameterType="com.shziyuan.flow.global.domain.flow.AccountDistributor">
+		update account_distributor set banlance=#{banlance},credit=#{credit},
+		receivable=#{receivable},present_banlance=#{present_banlance} where distributor_id=#{distributor_id}
+	</update>
+	
+	<update id="udpatePresent" parameterType="com.shziyuan.flow.global.domain.flow.LogAccountDistributorPresent">
+		update account_distributor set present_banlance=present_banlance+#{present} where distributor_id=#{distributor_id}
+	</update>
+
+</mapper>

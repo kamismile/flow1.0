@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: "jdbc:mysql://192.168.1.200:3306/jsunicom?useUnicode=true&characterEncoding=utf8"
+    username: flowplatform
+    password: 940430Dex
+    initial-size: 1
+    min-idle: 1
+    max-active: 20
+    max-wait: 30000
+    min-evictable-idle-time-millis: 300000
+    validation-query: select 1
+    test-while-idle: true
+    test-on-borrow: true
+    test-on-return: false
+    remove-abandoned: false
+    remove-abandoned-timeout: 600
+    log-abandoned: false
+    filters: stat

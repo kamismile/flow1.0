@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.AccountDistributorPresentRoleMapper" >
+	<select id="select" resultType="accountDistributorPresentRole" parameterType="map">
+		select * from account_distributor_present_role order by consumer
+	</select>
+	
+	<select id="selectOrderDesc" resultType="accountDistributorPresentRole">
+		select * from account_distributor_present_role order by consumer desc
+	</select>
+	
+	<insert id="insert" parameterType="accountDistributorPresentRole">
+		insert into account_distributor_present_role(consumer,present)
+		 values (#{consumer},#{present})
+	</insert>
+	
+	<delete id="delete" parameterType="int">
+		delete from account_distributor_present_role where id=#{id}
+	</delete>
+
+</mapper>

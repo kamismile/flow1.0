@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.PendingAccountDistirbutorMapper">
+	
+	<resultMap id="pendingMap" type="com.ziyuan.web.manager.domain.PendingAccountDistributorBean" >
+	    <id column="id" property="id" />
+	    <result column="distributor_id" property="distributor_id" />
+	    <result column="insert_time" property="insert_time" />
+	    <result column="update_user" property="update_user" />
+	    <result column="field" property="field" />
+	    <result column="banlance" property="banlance" />
+	    <result column="remark" property="remark" />
+	    
+	    <association property="distributor" javaType="infoDistributor">
+	        <result property="name" column="dis_name"/>
+	    </association>
+	    
+	  </resultMap>
+  
+	<select id="select" parameterType="map" resultMap="pendingMap" >
+		select p.*,dis.name dis_name from pending_account_distributor p
+		inner join info_distributor dis on dis.id=p.distributor_id
+		<where>
+			<if test="distributor_id != null">
+				p.distributor_id = #{distributor_id}
+			</if>
+			<if test="distributor_name != null">
+				and dis.name like '%${distributor_name}%'
+			</if>
+			<if test="start != null">
+				and p.insert_time&gt;=#{start}
+			</if>
+			<if test="end != null">
+				and p.insert_time&lt;=#{end}
+			</if>
+			
+		</where>
+	</select>
+	
+	<select id="selectOne" parameterType="int" resultType="pendingAccountDistributor">
+		select * from pending_account_distributor where id=#{id}
+	</select>
+	
+	<!-- 添加产品 -->
+	<insert id="insert" parameterType="pendingAccountDistributor" useGeneratedKeys="true" keyProperty="id">
+		insert into pending_account_distributor(distributor_id,insert_time,update_user,field,banlance,remark)
+		values(#{distributor_id},#{insert_time},#{update_user},#{field},#{banlance},#{remark})
+	</insert>
+	
+	<delete id="delete" parameterType="int">
+		delete from pending_account_distributor where id=#{id}
+	</delete>
+	
+</mapper>

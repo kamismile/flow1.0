@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.LogAccountDistributorPresentMapper" >
+	
+	<select id="select" resultType="logAccountDistributorPresent" parameterType="map">
+		select * from log_account_distributor_present
+		<where>
+			<if test="distributor_id != null">
+				and distributor_id=#{distributor_id}
+			</if>
+			<if test="start != null">
+				and insert_time &gt;=#{start}
+			</if>
+			<if test="end != null">
+				and insert_time &lt;=#{end}
+			</if>
+		</where>
+		order by insert_time desc
+	</select>
+	
+	<insert id="insert" parameterType="logAccountDistributorPresent">
+		insert into log_account_distributor_present 
+		select #{insert_time},#{distributor_id},name,#{year},#{month},#{consumer},#{present},#{update_user}
+		from info_distributor where id=#{distributor_id}
+	</insert>
+
+	<select id="selectAlreadyPresent" resultType="int">
+		select count(1) from log_account_distributor_present where year=#{year} and month=#{month}
+	</select>
+</mapper>

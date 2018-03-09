@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.author.WebAccountRoleMegerMapper">
+
+	<resultMap id="BaseResultMap" type="com.ziyuan.web.manager.domain.author.WebAccountRoleMegerBean" >
+	    <id column="id" property="id" />
+	    <result property="role" column="role"/>
+	    <result property="description" column="description"/>
+	    <result property="enabled" column="enabled"/>
+	    <result property="create_time" column="create_time"/>
+	    <result property="update_time" column="update_time"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="com.ziyuan.web.manager.domain.author.WebAccountRoleMegerBean">
+		insert into 
+			web_account_role_meger
+				(role,
+				description,
+				enabled,
+				create_time,
+				update_time) 
+			values
+				(#{role},
+				#{description},
+				#{enabled},
+				now(),
+				now())
+	</insert>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from 
+			web_account_role_meger 
+		where 
+			id = #{id}
+	</delete>
+	
+	<update id="update" parameterType="com.ziyuan.web.manager.domain.author.WebAccountRoleMegerBean">
+		update 
+			web_account_role_meger 
+		set 
+			role = #{role},
+			description = #{description},
+			enabled = #{enabled},
+			update_time = now()
+		where 
+			id=#{id}
+	</update>
+	
+	<select id="select" parameterType="map" resultMap="BaseResultMap">
+		select * from web_account_role_meger where enabled = 1
+	</select>
+	
+	<resultMap type="com.ziyuan.web.manager.domain.author.WebAccountRoleMegerBean" id="bindAuthorityMap">
+		 <id column="id" property="id" />
+	    <result property="role" column="role"/>
+	    <result property="description" column="description"/>
+	    <result property="enabled" column="enabled"/>
+	    <result property="create_time" column="create_time"/>
+	    <result property="update_time" column="update_time"/> 
+		<collection property="authorities" column="authorities" ofType="com.ziyuan.web.manager.domain.author.WebAccountAuthorityMegerBean">    
+            <id column="id" property="id" />
+		    <result property="authority" column="authority"/>
+		    <result property="description" column="description"/>
+		    <result property="enabled" column="enabled"/>
+		    <result property="create_time" column="create_time"/>
+		    <result property="update_time" column="update_time"/> 
+        </collection>
+	</resultMap>
+	
+	<select id="selectBindAuthority" parameterType="map" resultMap="bindAuthorityMap">
+		select 
+			aa.*,role.*
+		from 
+			web_account_role_meger role
+			LEFT JOIN bind_role_authority ra on role.id = ra.role_id
+			LEFT JOIN web_account_authority_meger aa on ra.authority_id = aa.id
+		where 
+			role.id = #{id}
+			and role.enabled = 1
+	</select>
+	
+	<select id="selectOneRole" resultMap="BaseResultMap" >
+		select 
+			* 
+		from 
+			web_account_role_meger 
+		<where>
+			<if test="description!=null ">
+				description like '%${description}%'
+			</if>
+			<if test="enabled != null ">
+				<if test="enabled != 'all' ">
+					AND enabled = #{enabled}
+				</if>
+			</if>
+		</where>
+	</select>
+	
+	
+</mapper>

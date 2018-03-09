@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.LogQueueOrderSubmitMapper" >
+	
+	<select id="selectLastSubmit" resultType="logQueueOrderSubmit" parameterType="map">
+		select insert_time,clientOrderNo,clientCode,phone,orderNo,resp_message from log_queue_order_submit
+		<where>
+			<if test="start != null">
+				insert_time &gt;= #{start}
+			</if>
+			<if test="end != null">
+				and insert_time &lt;= #{end}
+			</if>
+		</where>
+		order by insert_time desc
+		limit 10
+	</select>
+
+	<select id="selectByOrderNo" resultType="logQueueOrderSubmit" parameterType="string">
+		select * from log_queue_order_submit where orderNo=#{orderNo};
+	</select>
+</mapper>

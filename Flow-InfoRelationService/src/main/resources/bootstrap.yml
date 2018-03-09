@@ -1,0 +1,22 @@
+spring:
+  application:
+   name: info-relation-service
+  
+  redis:
+    database: 1
+    
+server:
+  port: 8773
+
+system:
+  whitelist:
+    ips: 
+      - 192.168.1.1
+      - 127.0.0.1
+  useRabbitNoti:
+    config: true
+    #configBind: true
+    order: true
+  
+#logging:
+#  path: /tmp/info-relation-service

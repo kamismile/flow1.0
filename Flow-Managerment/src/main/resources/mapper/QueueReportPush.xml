@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ziyuan.web.manager.dao.QueueReportPushMapper">
+	
+	<insert id="insert" parameterType="queueReportPush">
+		insert into queue_report_push(client_order_no,sku_mask,distributor_code,phone,pkg_type,
+			provinceid,order_no,source,consumer,connection_id,status,sku_id,sku,supplier_id,
+			supplier_name,supplier_code_id,supplier_code_name,standard_price,supplier_discount,
+			supplier_price,distributor_discount,distributor_price,distributor_id,distributor_name,
+			result_code,result_message,supplier_result,retries,notify_url)
+		 values(#{client_order_no},#{sku_mask},#{distributor_code},#{phone},#{pkg_type},
+			 #{provinceid},#{order_no},#{source},#{consumer},#{connection_id},#{status},#{sku_id},#{sku},#{supplier_id},
+			 #{supplier_name},#{supplier_code_id},#{supplier_code_name},#{standard_price},#{supplier_discount},
+			 #{supplier_price},#{distributor_discount},#{distributor_price},#{distributor_id},#{distributor_name},
+			 #{result_code},#{result_message},#{supplier_result},#{retries},#{notify_url})
+
+	</insert>
+</mapper>

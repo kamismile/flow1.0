@@ -1,0 +1,12 @@
+spring:
+  redis:
+    host: 192.168.1.200
+    port: 6379
+    password: 940430Dex
+system:
+  redis:
+    irs:
+      host: 192.168.1.200
+      port: 6379
+      password: 940430Dex
+      database: 1

@@ -1,0 +1,24 @@
+spring:
+  application:
+   name: queue-report-push
+  profiles:
+    active: dev
+  
+server:
+  port: 8092
+
+rest:
+  connection:
+    connect-timeout: 5000
+    connection-request-timeout: 5000
+    read-timeout: 5000
+    
+logging:
+  level:
+    console: debug
+    sys: debug
+
+system:
+  platform:
+    name: cc
+  

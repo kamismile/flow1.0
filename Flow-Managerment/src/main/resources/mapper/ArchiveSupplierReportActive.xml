@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.ArchiveSupplierReportActiveMapper">
+
+	<select id="select" parameterType="map" resultType="com.ziyuan.web.manager.domain.ArchiveSupplierReportActiveBean" >
+		select o.*,p.province,sku.operator,c.name scope_name,sku.rent_type,sku.pkgsize from archive_supplier_report_active o
+		left join info_sku sku on o.sku_id=sku.id
+		left join info_province p on p.provinceid = sku.provinceid
+		left join info_constant c on sku.scope_cid=c.id
+		<where>
+			<if test="distributor_name != null">
+				and distributor_name like '%${distributor_name}%'
+			</if>
+			<if test="supplier_name != null">
+				and supplier_name like '%${supplier_name}%'
+			</if>
+			<if test="order_no != null">
+				and order_no = #{order_no}
+			</if>
+			<if test="client_order_no != null">
+				and client_order_no = #{client_order_no}
+			</if>
+			<if test="phone != null">
+				and phone = #{phone}
+			</if>
+			<if test="operator != null">
+				and sku.operator = #{operator}
+			</if>
+			<if test="provinceid != null">
+				and sku.provinceid = #{provinceid}
+			</if>
+			<if test="startTime != null">
+				and insert_time <![CDATA[  >=  ]]> '${startTime} 00:00:00'
+			</if>
+			<if test="endTime != null">
+				and insert_time <![CDATA[  <  ]]> '${endTime} 00:00:00'
+			</if>
+		</where> 
+		order by process_time desc
+	</select>
+	
+	<delete id="deleteByOrderNo" parameterType="String">
+		delete from archive_supplier_report_active where order_no=#{order_no}
+	</delete>
+	
+	<delete id="delete" parameterType="com.ziyuan.web.manager.domain.ArchiveSupplierReportActive">
+		delete from archive_supplier_report_active where id=#{id}
+	</delete>
+	
+	<select id="selectOne" parameterType="Integer" resultType="com.ziyuan.web.manager.domain.ArchiveSupplierReportActive">
+	 select * from archive_supplier_report_active where id=#{id}
+	</select>
+	
+</mapper>

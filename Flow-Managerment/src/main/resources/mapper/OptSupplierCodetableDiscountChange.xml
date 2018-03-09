@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.OptSupplierCodetableDiscountChangeMapper" >
+	
+	<insert id="insert" parameterType="optSupplierCodetableDiscountChange">
+		insert into opt_supplier_codetable_discount_change(supplier_code_id,discount,price,effective,status) 
+			values(#{supplier_code_id},#{discount},#{price},#{effective},#{status})
+		ON DUPLICATE KEY UPDATE discount=#{discount},price=#{price},effective=#{effective},status=#{status}
+	</insert>
+
+</mapper>

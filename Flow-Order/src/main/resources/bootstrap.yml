@@ -1,0 +1,23 @@
+spring: 
+  application: 
+   name: order-service
+  
+  profiles:
+    active: dev
+  #配置时间格式
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    joda-date-time-format: yyyy-MM-dd HH:mm:ss
+    
+server:
+  port: 8770
+
+system: 
+  platform: 
+    name: jsunicom
+  
+
+  
+logging:
+  path: /tmp/order
+   

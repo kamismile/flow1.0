@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.ext.ExtCouponMapper">
+	<!-- 分页查询产品信息 -->
+	<select id="select" parameterType="map" resultType="com.ziyuan.web.manager.domain.ext.ECoupon" >
+		select * from ext_coupon
+		<where>
+			<if test="code != null">
+				code = #{code}
+			</if>
+			<if test="starttime != null">
+				and expiry&gt;=#{starttime}
+			</if>
+			<if test="endtime != null">
+				and expiry&lt;=#{endtime}
+			</if>
+			<if test="order_no != null">
+				and order_no = #{order_no}
+			</if>
+			<if test="phone != null">
+				and phone = #{phone}
+			</if>
+		</where>
+	</select>
+	
+	<select id="export" parameterType="map" resultType="com.ziyuan.web.manager.domain.ext.ECoupon" >
+		select * from ext_coupon
+		<where>
+			<if test="code != null">
+				code = #{code}
+			</if>
+			<if test="starttime != null">
+				and expiry&gt;=#{starttime}
+			</if>
+			<if test="endtime != null">
+				and expiry&lt;=#{endtime}
+			</if>
+			<if test="order_no != null">
+				and order_no = #{order_no}
+			</if>
+			<if test="phone != null">
+				and phone = #{phone}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 添加产品 -->
+	<insert id="insert" parameterType="com.ziyuan.web.manager.domain.ext.ECoupon">
+		insert into ext_coupon values(#{code},#{expiry},#{order_no},#{used_time},#{phone})
+	</insert>
+	
+</mapper>

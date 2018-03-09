@@ -1,0 +1,14 @@
+spring:
+  application:
+   name: log-db-writer
+  profiles:
+    active: dev
+  
+server:
+  port: 8094
+
+#logging:
+#  path: /tmp/info-relation-service
+
+
+  

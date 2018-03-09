@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+
+  <classPathEntry  
+        location="/Users/yaohu/.m2/repository/mysql/mysql-connector-java/6.0.6/mysql-connector-java-6.0.6.jar" />
+  <context id="context1">
+	<commentGenerator>  
+        <!-- 是否去除自动生成的注释 true：是 ： false:否 -->  
+        <property name="suppressAllComments" value="true"/>  
+    </commentGenerator>  
+    <jdbcConnection connectionURL="jdbc:mysql://192.168.1.200:3306/blendplatform?useUnicode=true&amp;characterEncoding=utf8" driverClass="com.mysql.jdbc.Driver" password="940430Dex" userId="flowplatform" />
+    <javaModelGenerator targetPackage="com.shziyuan.flow.cnfmanager.domain" targetProject="Flow-ConfigManagerment/src/main/java" />
+    
+    <javaClientGenerator targetPackage="com.shziyuan.flow.cnfmanager.dao" targetProject="Flow-ConfigManagerment/src/main/java" type="ANNOTATEDMAPPER" />
+    <table schema="blendplatform" tableName="info_platform">    
+      <columnOverride column="id" property="id" />
+      <columnOverride column="create_time" property="create_time" />
+      <columnOverride column="platform" property="platform" />
+      <columnOverride column="enabled" property="enabled" />
+      <columnOverride column="update_time" property="update_time" />
+      <columnOverride column="description" property="description" />
+    </table>
+    <table schema="blendplatform" tableName="info_module"></table>
+  </context>
+</generatorConfiguration>

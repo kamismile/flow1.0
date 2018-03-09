@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.LogWebSupplierCodetableDiscountChangeMapper" >
+	
+	<select id="select" resultType="logWebSupplierCodetableDiscountChange" parameterType="map">
+		select 
+			log.* 
+		from log_web_supplier_codetable_discount_change log
+			LEFT JOIN info_supplier_codetable info on log.supplier_code_id = info.id
+		<where>
+			<if test="start != null">
+				insert_time &gt;= #{start}
+			</if>
+			<if test="end != null">
+				and insert_time &lt;= #{end}
+			</if>
+			<if test="supplier_id != null">
+				and info.supplier_id = #{supplier_id}
+			</if>
+		</where>
+	</select>
+	
+	<select id="export" resultType="logWebSupplierCodetableDiscountChange" parameterType="map">
+		select 
+			log.* 
+		from log_web_supplier_codetable_discount_change log
+			LEFT JOIN info_supplier_codetable info on log.supplier_code_id = info.id
+		<where>
+			<if test="start != null">
+				insert_time &gt;= #{start}
+			</if>
+			<if test="end != null">
+				and insert_time &lt;= #{end}
+			</if>
+			<if test="supplier_id != null">
+				and info.supplier_id = #{supplier_id}
+			</if>
+		</where>
+	</select>
+	
+	<insert id="insert" parameterType="logWebSupplierCodetableDiscountChange">
+		insert into log_web_supplier_codetable_discount_change(
+			insert_time,update_user,supplier_code_id,supplier_code_name,
+			supplier_code_code,before_price,before_discount,after_price,after_discount,effective) 
+		values(#{insert_time},#{update_user},#{supplier_code_id},#{supplier_code_name},
+			#{supplier_code_code},#{before_price},#{before_discount},#{after_price},#{after_discount},#{effective})
+	</insert>
+
+</mapper>

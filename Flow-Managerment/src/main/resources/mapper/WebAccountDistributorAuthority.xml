@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.WebAccountDistributorAuthorityMapper">
+
+	<select id="selectByDistributorId" parameterType="int" resultType="webAccountDistributorAuthority" >
+		select * from web_account_distributor_authority where distributor_id = #{distributor_id}
+	</select>
+	
+	<delete id="deleteByDistributorId" parameterType="webAccountDistributorAuthority">
+		delete from web_account_distributor_authority where distributor_id=#{distributor_id} and authority=#{authority}
+	</delete>
+	
+	<delete id="delete" parameterType="int">
+		delete from web_account_distributor_authority where id = #{id}
+	</delete>
+		
+	<insert id="insert" parameterType="webAccountDistributorAuthority" useGeneratedKeys="true" keyProperty="id">
+		insert ignore into web_account_distributor_authority(distributor_id,authority) values(#{distributor_id},#{authority})
+	</insert>
+	
+	
+</mapper>

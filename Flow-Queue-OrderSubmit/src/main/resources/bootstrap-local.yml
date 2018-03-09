@@ -1,0 +1,34 @@
+spring:
+  application:
+   name: queue-order-submit
+  
+  rabbitmq:
+    host: 192.168.1.200
+    port: 5672
+    username: mq
+    password: 940430Dex
+    
+  cloud:
+    config:
+      uri: http://127.0.0.1:8762
+      profile: dev
+    
+eureka:
+ client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:8761/eureka/
+#server:
+#  port: 8773
+
+logging:
+  level:
+    console: debug
+    sys: debug
+
+system:
+  platform:
+    name: cc
+  supplier:
+    pool-thread-num: 50
+  groovy:
+    directorys: classpath:/groovy

@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: "jdbc:mysql://192.168.1.200:3306/blendplatform?useUnicode=true&characterEncoding=utf8"
+    #url: "jdbc:mysql://support.shziyuan.cn:53306/blendplatform?useUnicode=true&characterEncoding=utf8"
+    username: flowplatform
+    password: 940430Dex
+  data:
+    rest:
+      base-path: /datarest/
+    
+config-server:
+  svn-server:
+    svnRoot: http://support.shziyuan.cn:8000/svn/config-repo/cloud-config/
+    username: james.hu
+    password: 940430dex
+  svn-local:
+    workspace: svnWorkspace

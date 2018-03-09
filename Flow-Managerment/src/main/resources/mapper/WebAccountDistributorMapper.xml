@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.WebAccountDistributorMapper">
+	
+	<resultMap id="BaseResultMap" type="com.ziyuan.web.manager.domain.WebAccountDistributorAuthBean" >
+	    <id column="id" property="id" />
+	    <result column="distributor_id" property="distributor_id" />
+	    <result column="password" property="password" />
+	    <result column="enabled" property="enabled" />
+	   
+	    <collection property="authority" ofType="com.shziyuan.flow.global.domain.flow.WebAccountDistributorAuthority" >
+	        <id property="id" column="auth_id" />
+	        <result property="authority" column="auth_authority"/>
+	    </collection>
+	  </resultMap>
+	  
+	<update id="update" parameterType="webAccountDistributor" >
+		update web_account_distributor set password=#{password},enabled=#{enabled}
+		where distributor_id=#{distributor_id}
+	</update>
+	
+	<select id="selectOne" parameterType="int" resultMap="BaseResultMap">
+		select acc.*,auth.id auth_id,auth.authority auth_authority from web_account_distributor acc
+		left join web_account_distributor_authority auth on acc.distributor_id=auth.distributor_id
+		 where acc.distributor_id = #{id}
+	</select>
+	
+	<update id="updateAccountInfo" parameterType="com.shziyuan.flow.global.domain.flow.InfoDistributor">
+		update info_distributor set info_company_name=#{info_company_name},info_contact=#{info_contact},
+		info_tel=#{info_tel},info_email=#{info_email}
+		where id=#{id}
+	</update>
+	
+	<insert id="insert" parameterType="webAccountDistributor">
+		insert into web_account_distributor values(#{distributor_id},#{password},#{enabled})
+	</insert>
+	
+</mapper>

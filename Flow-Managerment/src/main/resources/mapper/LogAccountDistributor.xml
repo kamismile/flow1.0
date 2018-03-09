@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.LogAccountDistributorMapper" >
+	<insert id="insert" parameterType="logAccountDistributor">
+		insert into log_account_distributor(insert_time,distributor_id,distributor_name,
+		update_user,before_banlance,before_credit,before_receivable,before_donation,
+		after_banlance,after_credit,after_receivable,after_donation,price,action,remark,pending_id) 
+		values(#{insert_time},#{distributor_id},(select name from info_distributor where id=#{distributor_id} limit 1),
+		#{update_user},#{before_banlance},#{before_credit},#{before_receivable},#{before_donation},
+		#{after_banlance},#{after_credit},#{after_receivable},#{after_donation},#{price},#{action},#{remark},#{pending_id})
+	</insert>
+	
+	<select id="select" resultType="logAccountDistributor" parameterType="map">
+		select * from log_account_distributor
+		<where>
+			<if test="start != null">
+				insert_time &gt;= #{start}
+			</if>
+			<if test="end != null">
+				and insert_time &lt;= #{end}
+			</if>
+			<if test="distributor_name != null">
+				and distributor_name like '%${distributor_name}%'
+			</if>
+			<if test="distributor_id != null">
+				and distributor_id = '%${distributor_id}%'
+			</if>
+			<if test="update_user != null">
+				and update_user like '%${update_user}%'
+			</if>
+			<if test="action != null">
+				and action like '%${action}%'
+			</if>
+			<if test="username != null">
+				and distributor_name = #{username}
+			</if>
+		</where>
+	</select>
+	
+	<select id="export" resultType="logAccountDistributor" parameterType="map">
+		select * from log_account_distributor
+		<where>
+			<if test="start != null">
+				insert_time &gt;= #{start}
+			</if>
+			<if test="end != null">
+				and insert_time &lt;= #{end}
+			</if>
+			<if test="name != null">
+				and distributor_name like '%${distributor_name}%'
+			</if>
+			<if test="distributor_id != null">
+				and distributor_id like '%${distributor_id}%'
+			</if>
+			<if test="update_user != null">
+				and update_user like '%${update_user}%'
+			</if>
+			<if test="action != null">
+				and action like '%${action}%'
+			</if>
+		</where>
+	</select>
+</mapper>

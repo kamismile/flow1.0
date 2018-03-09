@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>info-relation-service</artifactId>
+	<packaging>jar</packaging>
+
+	<name>Flow-InfoRelationService</name>
+	<description>FlowPlatform Info relation service</description>
+
+	<parent>
+		<groupId>com.shziyuan.flow</groupId>
+		<artifactId>maven-base</artifactId>
+		<version>1.0.0</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<server.port>8773</server.port>
+		<spring.config.location>--spring.config.location=classpath:/common.yml,classpath:/db.yml,classpath:/redis-irs.yml,classpath:/rabbit.yml</spring.config.location>
+		<skipTests>true</skipTests>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>flow-mq-stream-base</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>flow-redis-base</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+		    <groupId>com.alibaba</groupId>
+		    <artifactId>druid</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-cassandra</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>  
+			    <groupId>org.apache.maven.plugins</groupId>  
+			    <artifactId>maven-source-plugin</artifactId>  
+			    <executions>  
+			      <execution>  
+			        <id>attach-sources</id>  
+			        <phase>verify</phase>  
+			        <goals>  
+			          <goal>repackage</goal>  
+			        </goals>  
+			      </execution>  
+			    </executions>  
+			  </plugin> 
+		
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.LogQueueSupplierReportMapper" >
+	
+	<select id="selectLastReport" resultType="logQueueSupplierReport" parameterType="map">
+		SELECT log.insert_time,log.client_order_no,log.order_no,log.sku,log.phone,log.supplier_code_name,log.http_if_code 
+		FROM log_queue_supplier_report log
+		inner join info_supplier_codetable ct on log.supplier_code_id=ct.id
+		<where>
+			<if test="operator != null">
+				ct.operator=#{operator}
+			</if>
+			<if test="provinceid != null">
+				and ct.provinceid = #{provinceid}
+			</if>
+			<if test="start != null">
+				and log.insert_time &gt;= #{start}
+			</if>
+			<if test="end != null">
+				and log.insert_time &lt;= #{end}
+			</if>
+		</where>
+		order by insert_time desc
+		limit 10
+	</select>
+	
+	<select id="selectByOrderNo" resultType="logQueueSupplierReport" parameterType="string">
+		select * from log_queue_supplier_report where order_no=#{order_no}
+	</select>
+
+</mapper>

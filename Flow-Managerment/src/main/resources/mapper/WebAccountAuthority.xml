@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.WebAccountAuthorityMapper">
+
+	<select id="selectByAccountId" parameterType="int" resultType="webAccountAuthority" >
+		select * from web_account_authority where account_id = #{account_id}
+	</select>
+	
+	<delete id="deleteByAccountId" parameterType="int">
+		delete from web_account_authority where account_id=#{account_id}
+	</delete>
+	
+	<delete id="delete" parameterType="int">
+		delete from web_account_authority where id = #{id}
+	</delete>
+		
+	<insert id="insert" parameterType="webAccountAuthority" useGeneratedKeys="true" keyProperty="id">
+		insert into web_account_authority(account_id,authority) values(#{account_id},#{authority})
+	</insert>
+	
+	
+</mapper>

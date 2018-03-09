@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.InfoSupplierCodetableMapper" >
+	<resultMap id="BaseResultMap" type="com.ziyuan.web.manager.domain.InfoSupplierCodetableBean" >
+		<id column="id" property="id" />
+	    <result column="supplier_id" property="supplier_id" />
+	    <result column="province" property="province" />
+	    <result column="operator" property="operator" />
+	    <result column="scope_name" property="scope_name" />
+	    <result column="via_attribute" property="via_attribute" />
+	    <result column="code" property="code" />
+	    <result column="discount" property="discount" />
+	    <result column="price" property="price" />
+	    <result column="if_attribute" property="if_attribute" />
+	    <result column="enabled" property="enabled" />
+	    <result column="supplier_name" property="supplier_name" />
+	    <result column="pkgsize" property="pkgsize" />
+	    <result column="info_ptype" property="info_ptype" />
+	    <result column="info_net" property="info_net" />
+	    <result column="rent_type" property="rent_type" />
+	    <result column="cache_mode" property="cache_mode" />
+	    <result column="discount_price" property="discount_price" />
+	    <result column="code_type" property="code_type" />
+	    <result column="code_param" property="code_param" />
+	</resultMap>
+	
+	<resultMap id="TreeMap" type="com.ziyuan.web.manager.domain.TreeBean" >
+		<result column="id" property="codetable_id" />
+		<result column="name" property="supplier_name" />
+		<result column="province" property="province" />
+		<result column="operator" property="operator" />
+		<result column="scope_name" property="scope_name" />
+		<result column="total" property="total" />
+		<result column="min_price" property="min_price" />
+	</resultMap>
+	
+	<select id="select" resultMap="BaseResultMap" parameterType="map">
+		SELECT
+			sc.*, p.province,
+			price*discount discount_price,
+			c. NAME scope_name
+		FROM
+			info_supplier_codetable sc
+		JOIN info_province p ON p.provinceid = sc.provinceid
+		JOIN info_constant c ON c.id = sc.scope_cid
+		<where>
+			<if test="name!=null ">
+				AND sc.`name` like '%${name}%'
+			</if>
+			<if test="supplier_id !=null ">
+				AND supplier_id=#{supplier_id}
+			</if>
+			<if test="provinceid!=null ">
+				AND sc.provinceid=#{provinceid}
+			</if>
+			<if test="operator != null and operator!=''">
+				AND operator=#{operator}
+			</if>
+			<if test="scope_cid != null">
+				AND scope_cid=#{scope_cid}
+			</if>
+			<if test="enabled != null">
+				AND enabled=#{enabled}
+			</if>
+			<if test="rent_type !=null ">
+				AND rent_type=#{rent_type}
+			</if>
+			<if test="code_type !=null ">
+				AND code_type=#{code_type}
+			</if>
+		</where>
+		<if test="sort != null">
+		order by ${sort} ${order}
+		</if>
+	</select>
+	
+	<update id="update" parameterType="infoSupplierCodetable">
+		update info_supplier_codetable set provinceid = #{provinceid}, operator = #{operator},
+	      scope_cid = #{scope_cid},code = #{code},name = #{name},discount = #{discount},
+	      price = #{price},enabled = #{enabled},pkgsize=#{pkgsize},info_ptype=#{info_ptype},
+	      info_net=#{info_net},rent_type=#{rent_type},cache_mode=#{cache_mode},code_type=#{code_type}
+		where id = #{id}
+	</update>
+	<!-- 通过id删除供应商产品 -->
+	<delete id="delete" parameterType="int">
+		delete from info_supplier_codetable where id = #{id}
+	</delete>
+	
+	<!-- 按供应商查询产品 -->
+	<select id="listSupplierSkuBySupplier" resultMap="TreeMap">
+		select info.name,code.operator,vp.province,ic.name scope_name,code.id,min(code.price) min_price,count(*) total from
+		bind_supplier bind
+		inner join info_supplier_codetable code on bind.supplier_code_id=code.id
+		inner join info_supplier info on info.id=code.supplier_id
+		left join info_province vp on code.provinceid = vp.provinceid
+		inner join info_constant ic on code.scope_cid = ic.id
+		group by info.name,code.operator,vp.province,scope_name,code.id
+	</select>
+	
+	<!--  新增供应商产品-->
+	<insert id="insert" parameterType="infoSupplierCodetable" useGeneratedKeys="true" keyProperty="id">
+		insert into info_supplier_codetable(supplier_id,provinceid,operator,scope_cid,
+			code,name,discount,price,enabled,pkgsize,info_ptype,info_net,rent_type,cache_mode,code_type)
+		values(#{supplier_id},#{provinceid},#{operator},#{scope_cid},
+			#{code},#{name},#{discount},#{price},#{enabled},#{pkgsize},#{info_ptype},#{info_net},#{rent_type},#{cache_mode},#{code_type})
+	</insert>
+
+	<!-- 修改供应商信息-->
+	<update id="updateSupplierInfoAttribute" parameterType="infoSupplier">
+		update info_supplier set if_attribute=#{if_attribute},pclass=#{pclass}
+		where id=#{id}
+	</update>
+	
+	<!-- 更新产品缓存 -->
+	<update id="updateCacheTable" parameterType="infoSupplierCodetable">
+		update info_supplier_codetable set cache_mode=#{cache_mode} where id=#{id}
+	</update>
+	
+	<!-- TREE -->
+	<resultMap type="com.ziyuan.web.manager.domain.TreeBindBean" id="treeBySupplierMap">
+		<id column="id" property="id" />
+		<result column="name" property="name"/>
+		<collection property="childs" ofType="com.ziyuan.web.manager.domain.TreeBindBean">
+			<id column="provinceid" property="id" />
+			<result column="province" property="name"/>
+			<collection property="childs" ofType="com.ziyuan.web.manager.domain.TreeBindBean">
+				<id column="scope_cid" property="id"/>
+				<result column="scope_name" property="name" />
+				<result column="operator" property="operator" />
+				<result column="discount_min" property="discount_min"/>
+				<result column="count" property="count"/>
+			</collection>
+		</collection>
+	</resultMap>
+	<select id="selectTree" resultMap="treeBySupplierMap">
+		select sp.id,sp.name,bind.operator,bind.provinceid,pv.province,
+			bind.scope_cid,ic.name scope_name,bind.discount_min,bind.count from(
+		select ct.supplier_id,ct.operator,ct.provinceid,ct.scope_cid,min(ct.discount) discount_min,count(ct.id) count
+		from info_supplier_codetable ct
+		inner join info_supplier sp on ct.supplier_id=sp.id
+		group by ct.supplier_id,ct.operator,ct.provinceid,ct.scope_cid ) bind
+		left join info_supplier sp on bind.supplier_id=sp.id
+		left join info_province pv on bind.provinceid=pv.provinceid
+		left join info_constant ic on bind.scope_cid=ic.id
+		order by sp.id,bind.provinceid,bind.scope_cid
+	</select>
+	
+	<resultMap type="com.ziyuan.web.manager.domain.TreeBindBean" id="treeMap2">
+		<id column="operator" property="name" />
+		<result column="operator" property="name"/>
+		<collection property="childs" ofType="com.ziyuan.web.manager.domain.TreeBindBean">
+			<id column="provinceid" property="id" />
+			<result column="provinceid" property="name"/>
+			<collection property="childs" ofType="com.ziyuan.web.manager.domain.TreeBindBean">
+				<result column="scope_cid" property="id" />
+				<result column="scope_cid" property="name" />
+				<result column="counts" property="count" />
+				<result column="discount_min" property="discount_min" />
+			</collection>
+		</collection>
+	</resultMap>
+	<select id="selectTreeInCodetable2" resultMap="treeMap2">
+		select operator,provinceid,scope_cid,count(*) counts,min(discount) discount_min
+		from info_supplier_codetable
+		group by operator,provinceid,scope_cid
+	</select>
+	
+	
+	<resultMap type="com.ziyuan.web.manager.domain.InfoSupplierCodetableBean" id="joinSupplierMap" extends="BaseResultMap">
+		<result column="name" property="name"/>
+		<association property="supplier" javaType="infoSupplier">
+			<id column="supplier_id" property="id" />
+			<result column="supplier_name" property="name"/>
+			<result column="supplier_enabled" property="enabled"/>
+		</association>
+		<association property="change" javaType="optSupplierCodetableDiscountChange">
+			<result column="change_discount" property="discount"/>
+			<result column="change_price" property="price"/>
+			<result column="change_effective" property="effective"/>
+		</association>
+	</resultMap>
+	
+	<select id="selectJoinSupplier" resultMap="joinSupplierMap" parameterType="map">
+		select ct.*,pv.province,ic.name scope_name,
+		sp.id supplier_id,sp.name supplier_name,sp.enabled supplier_enabled,
+		optc.discount change_discount,optc.price change_price,optc.effective change_effective
+		from info_supplier_codetable ct
+		inner join info_supplier sp on ct.supplier_id=sp.id
+		left join info_province pv on ct.provinceid=pv.provinceid
+		left join info_constant ic on ct.scope_cid=ic.id
+		left join opt_supplier_codetable_discount_change optc on optc.supplier_code_id=ct.id
+		<where>
+			<if test="operator != null">and ct.operator=#{operator}</if>
+			<if test="provinceid != null">and ct.provinceid=#{provinceid}</if>
+			<if test="scope_cid != null">and ct.scope_cid=#{scope_cid}</if>
+			<if test="supplier_id != null">and ct.supplier_id=#{supplier_id}</if>
+		</where>
+		order by ct.id,ct.operator,ct.price
+	</select>
+	
+	<select id="exportJoinSupplier" resultMap="joinSupplierMap" parameterType="map">
+		select ct.*,pv.province,ic.name scope_name,
+		sp.id supplier_id,sp.name supplier_name,sp.enabled supplier_enabled,
+		optc.discount change_discount,optc.price change_price,optc.effective change_effective
+		from info_supplier_codetable ct
+		inner join info_supplier sp on ct.supplier_id=sp.id
+		left join info_province pv on ct.provinceid=pv.provinceid
+		left join info_constant ic on ct.scope_cid=ic.id
+		left join opt_supplier_codetable_discount_change optc on optc.supplier_code_id=ct.id
+		<where>
+			optc.discount is not NULL
+			<if test="operator != null">and ct.operator=#{operator}</if>
+			<if test="provinceid != null">and ct.provinceid=#{provinceid}</if>
+			<if test="scope_cid != null">and ct.scope_cid=#{scope_cid}</if>
+			<if test="supplier_id != null">and ct.supplier_id=#{supplier_id}</if>
+		</where>
+		order by ct.id,ct.operator,ct.price
+	</select>
+	
+	<select id="selectJoinSku" resultMap="joinSupplierMap" parameterType="map">
+		select ct.*,pv.province,ic.name scope_name,
+		sp.id supplier_id,sp.name supplier_name,sp.enabled supplier_enabled,
+		optc.discount change_discount,optc.price change_price,optc.effective change_effective
+		from info_supplier_codetable ct
+		inner join bind_supplier bind on bind.supplier_code_id=ct.id
+		inner join info_sku sku on sku.id=bind.sku_id
+		inner join info_supplier sp on ct.supplier_id=sp.id
+		left join info_province pv on ct.provinceid=pv.provinceid
+		left join info_constant ic on ct.scope_cid=ic.id
+		left join opt_supplier_codetable_discount_change optc on optc.supplier_code_id=ct.id
+		where sku.id=#{sku_id}
+		order by ct.id,ct.operator,ct.price
+	</select>
+	
+	<select id="selectCountByCode" resultType="Integer">
+		select count(*) from info_supplier_codetable where supplier_id=#{supplier_id} and code=#{code}
+	</select>
+	
+	<update id="updateCodeParam" parameterType="com.shziyuan.flow.global.domain.flow.InfoSupplierCodetable">
+		UPDATE 
+			info_supplier_codetable
+		SET 
+			code_param = #{code_param}
+		WHERE
+			id = #{id}
+	</update>
+	
+</mapper>

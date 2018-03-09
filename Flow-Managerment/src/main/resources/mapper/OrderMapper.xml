@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.OrderMapper" >
+	<resultMap type="com.ziyuan.web.manager.domain.OrderReportBean" id="reportMap">
+		<result property="ctime" column="ctime" />
+		<result property="count" column="count" />
+		<result property="sales" column="sales" />
+		<result property="cost" column="cost" />
+		<result property="standard" column="standard" />
+		<association property="distributor" javaType="infoDistributor">
+			<id column="distributor_id" property="id" />
+			<result column="dis_name" property="name"/>
+		</association>
+		<association property="supplier" javaType="infoSupplier">
+			<id column="supplier_id" property="id" />
+			<result column="sup_name" property="name"/>
+		</association>
+		<association property="infoSku" javaType="infoSku">
+			<id column="sku_id" property="id" />
+		    <result column="sku_name" property="name" />
+		    <result column="sku_sku" property="sku" />
+		    <result column="sku_rent_type" property="rent_type" />
+		    <result column="sku_pkgsize" property="pkgsize" />
+		    <result column="sku_provinceid" property="provinceid" />
+		    <result column="sku_operator" property="operator" />
+		    <result column="sku_scope_cid" property="scope_cid" />
+		</association>
+	</resultMap>
+	
+	<resultMap type="com.ziyuan.web.manager.domain.OrderReportBean" id="orderMap">
+		<id property="order_no" column="order_no" />
+		<result property="client_order_no" column="client_order_no" />
+		<result property="distributor_code" column="distributor_code" />
+		<result property="phone" column="phone" />
+		<result property="create_time" column="create_time" />
+		<result property="sku_id" column="sku_id" />
+		<result property="sku" column="sku" />
+		<result property="supplier_id" column="supplier_id" />
+		<result property="supplier_name" column="supplier_name" />
+		<result property="supplier_code_id" column="supplier_code_id" />
+		<result property="supplier_code_name" column="supplier_code_name" />
+		<result property="standard_price" column="standard_price" />
+		<result property="supplier_discount" column="supplier_discount" />
+		<result property="supplier_price" column="supplier_price" />
+		<result property="distributor_discount" column="distributor_discount" />
+		<result property="distributor_price" column="distributor_price" />
+		<result property="distributor_id" column="distributor_id" />
+		<result property="distributor_name" column="distributor_name" />
+		<result property="notify_url" column="notify_url" />
+		<result property="state" column="state" />
+		<result property="status_submit_code" column="status_submit_code" />
+		<result property="status_submit_message" column="status_submit_message" />
+		<result property="status_report_code" column="status_report_code" />
+		<result property="status_report_message" column="status_report_message" />
+		<result property="http_code_push" column="http_code_push" />
+		<result property="status_push_code" column="status_push_code" />
+		<result property="status_push_message" column="status_push_message" />
+		<result property="supplier_report_success" column="supplier_report_success" />
+		<result property="sku_provinceid" column="sku_provinceid" />
+		<result property="pkgsize" column="pkgsize" />
+		<result property="fee_type" column="fee_type" />
+		<result property="supplier_sort" column="supplier_sort" />
+		<result property="state_payment" column="state_payment" />
+		<association property="infoSku" javaType="com.shziyuan.flow.global.domain.flow.InfoSku">
+			<id column="sku_id" property="id" />
+		    <result column="sku_name" property="name" />
+		    <result column="sku_sku" property="sku" />
+		    <result column="sku_rent_type" property="rent_type" />
+		    <result column="sku_pkgsize" property="pkgsize" />
+		    <result column="sku_provinceid" property="provinceid" />
+		    <result column="sku_operator" property="operator" />
+		    <result column="sku_scope_cid" property="scope_cid" />
+		</association>
+	</resultMap>
+	
+	<!-- 渠道商统计报表 -->
+	<select id="listDistributorStaticsReportDaily" parameterType="map" resultType="com.ziyuan.web.manager.domain.OrderBean">
+		select statics.create_time,info.id distributor_id,info.name distributor_name,sku.sku,sku.name sku_name,sku.rent_type,sku.pkgsize,p.province,operator,c.name scope_name,statics.count,statics.bid,statics.sales,statics.standard from
+
+		(select create_time,distributor_id,sku_id
+		,count(*) count,sum(distributor_price) sales,sum(supplier_price) bid,sum(standard_price) standard from view_order where supplier_report_success = 80
+		group by DATE_FORMAT(create_time,'%m-%d-%Y'),distributor_id,sku_id) statics
+		inner join info_sku sku on sku.id=statics.sku_id
+		inner join info_distributor info on info.id=statics.distributor_id
+		left join info_constant c on sku.scope_cid=c.id
+		left join info_province p on sku.provinceid=p.provinceid
+		<where>
+			<if test="distributor_name != null">
+				info.name like '%${distributor_name}%'
+			</if>
+			<if test="distributor_id != null">
+				info.id =#{distributor_id}
+			</if>
+			<if test="sku != null">
+				and sku.sku like '%${sku}%'
+			</if>
+			<if test="startTime != null">
+				and statics.create_time <![CDATA[  >=  ]]> '${startTime} 00:00:00'
+			</if>
+			<if test="endTime != null">
+				and statics.create_time <![CDATA[  <  ]]> '${endTime} 00:00:00'
+			</if>
+		</where> 
+		order by DATE_FORMAT(statics.create_time,'%m-%d-%Y') desc,info.id
+		
+	</select>
+	
+	<!-- 供应商统计报表 -->
+	<select id="listSupplierStaticsReportDaily" parameterType="map" resultType="com.ziyuan.web.manager.domain.OrderBean">
+		select statics.create_time,info.id supplier_id,info.name supplier_name,sku.sku,p.province,operator,c.name scope_name,statics.count,statics.bid,statics.sales,statics.standard from
+
+		(select create_time,supplier_id,sku_id
+		,count(*) count,sum(distributor_price) sales,sum(supplier_price) bid,sum(standard_price) standard from view_order where supplier_report_success = 80
+		group by DATE_FORMAT(create_time,'%m-%d-%Y'),supplier_id,sku_id) statics
+		inner join info_sku sku on sku.id=statics.sku_id
+		inner join info_supplier info on info.id=statics.supplier_id
+		left join info_constant c on sku.scope_cid=c.id
+		left join info_province p on sku.provinceid=p.provinceid
+		<where>
+			<if test="supplier_name != null">
+				info.name like '%${supplier_name}%'
+			</if>
+			<if test="sku != null">
+				and sku.sku like '%${sku}%'
+			</if>
+			<if test="startTime != null">
+				and statics.create_time <![CDATA[  >=  ]]> '${startTime} 00:00:00'
+			</if>
+			<if test="endTime != null">
+				and statics.create_time <![CDATA[  <  ]]> '${endTime} 00:00:00'
+			</if>
+		</where> 
+		order by DATE_FORMAT(statics.create_time,'%m-%d-%Y') desc,info.id
+	</select>
+	
+	<select id="listDistributorStaticsReportMonthly" parameterType="map" resultType="com.ziyuan.web.manager.domain.OrderBean">
+		select statics.create_time,info.id distributor_id,info.name distributor_name,sku.sku,p.province,operator,c.name scope_name,statics.count,statics.bid,statics.sales,statics.standard from
+
+		(select create_time,distributor_id,sku_id
+		,count(*) count,sum(distributor_price) sales,sum(supplier_price) bid,sum(standard_price) standard from view_order where supplier_report_success = 80
+		group by DATE_FORMAT(create_time,'%m-%Y'),distributor_id,sku_id) statics
+		inner join info_sku sku on sku.id=statics.sku_id
+		inner join info_distributor info on info.id=statics.distributor_id
+		left join info_constant c on sku.scope_cid=c.id
+		left join info_province p on sku.provinceid=p.provinceid
+		<where>
+			<if test="distributor_name != null">
+				info.name like '%${distributor_name}%'
+			</if>
+			<if test="sku != null">
+				and sku.sku like '%${sku}%'
+			</if>
+			<if test="startTime != null">
+				and statics.create_time <![CDATA[  >=  ]]> '${startTime}-01 00:00:00'
+			</if>
+			<if test="endTime != null">
+				and statics.create_time <![CDATA[  <  ]]> '${endTime} 00:00:00'
+			</if>
+		</where> 
+		order by DATE_FORMAT(statics.create_time,'%m-%Y') desc,info.id
+	</select>
+	
+	<select id="listAccountStatics" resultMap="reportMap">
+		SELECT
+			info. NAME distributor_name,
+			p.province,
+			sku.sku,
+			operator,
+			c. NAME scope_name,
+			statics.count,
+			statics.bid,
+			statics.sales,
+			statics.standard
+		FROM
+			(
+				SELECT
+					distributor_id,
+					sku_provinceid,
+					sku_id,
+					count(*) count,
+					sum(distributor_price) sales,
+					sum(supplier_price) bid,
+					sum(standard_price) standard
+				FROM
+					view_order
+		<where>
+			<if test="1==1">
+				supplier_report_success = 1
+			</if>
+			<if test="startTime != null">
+				and create_time <![CDATA[  >=  ]]> '${startTime} 00:00:00'
+			</if>
+			<if test="endTime != null">
+				and create_time <![CDATA[  <  ]]> '${endTime} 00:00:00'
+			</if>
+		</where>
+		group by distributor_id,sku_provinceid,sku_id) statics
+		
+		inner join info_sku sku on sku.id=statics.sku_id
+		inner join info_distributor info on info.id=statics.distributor_id
+		left join info_constant c on sku.scope_cid=c.id
+		left join info_province p on statics.sku_provinceid=p.provinceid
+		<where>
+			<if test="distributor_id != null">
+				info.id =#{distributor_id}
+			</if>
+			<if test="sku != null">
+				and sku.sku like '%${sku}%'
+			</if>
+			<if test="provinceid != null">
+				and sku.provinceid = #{provinceid}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 供应商统计报表 -->
+	<select id="listSupplierStaticsReport" parameterType="map" resultMap="reportMap">
+		SELECT
+			DATE_FORMAT(
+				o.create_time,
+				'${dateFmtCtime}'
+			) ctime,
+			o.supplier_id,
+			o.sku_id,
+			count(*) count,
+			sum(o.distributor_price) sales,
+			sum(o.supplier_price) cost,
+			sum(o.standard_price) standard,
+			sup. NAME sup_name,
+			sku.sku sku_sku,
+			sku. NAME sku_name,
+			sku.rent_type sku_rent_type,
+			sku.pkgsize sku_pkgsize,
+			sku.provinceid sku_provinceid,
+			sku.operator sku_operator,
+			sku.scope_cid sku_scope_cid
+		FROM
+			view_order o
+		LEFT JOIN info_sku sku ON sku.id = o.sku_id
+		LEFT JOIN info_supplier sup ON o.supplier_id = sup.id
+		<where>
+			o.supplier_report_success=80
+			<if test="supplier_name != null">
+				and sup.name like '%${supplier_name}%'
+			</if>
+			<if test="supplier_id != null">
+				and sup.id =#{supplier_id}
+			</if>
+			<if test="sku != null">
+				and sku.sku like '%${sku}%'
+			</if>
+			<if test="sku_name != null">
+				and sku.name like '%${sku_name}%'
+			</if>
+			<if test="startTime != null">
+				and o.create_time &gt;= '${startTime}'
+			</if>
+			<if test="endTime != null">
+				and o.create_time &lt;= '${endTime}'
+			</if>
+		</where> 
+		group by ctime,o.supplier_id,o.sku_id
+		order by ctime ,o.supplier_id,sku.id
+	</select>
+	
+	<select id="listSupplierStaticsReportProvinceDaily" resultMap="reportMap">
+		SELECT
+			statics.create_time,
+			info. NAME supplier_name,
+			p.province,
+			sku.sku,
+			operator,
+			c. NAME scope_name,
+			statics.count,
+			statics.bid,
+			statics.sales,
+			statics.standard
+		FROM
+			(
+				SELECT
+					create_time,
+					supplier_id,
+					sku_provinceid,
+					sku_id,
+					count(*) count,
+					sum(distributor_price) sales,
+					sum(supplier_price) bid,
+					sum(standard_price) standard
+				FROM
+					view_order
+				WHERE
+					supplier_report_success = 80
+				GROUP BY
+					DATE_FORMAT(create_time, '%m-%d-%Y'),
+					supplier_id,
+					sku_provinceid,
+					sku_id
+			) statics
+		INNER JOIN info_sku sku ON sku.id = statics.sku_id
+		INNER JOIN info_supplier info ON info.id = statics.supplier_id
+		LEFT JOIN info_constant c ON sku.scope_cid = c.id
+		LEFT JOIN info_province p ON statics.sku_provinceid = p.provinceid
+		ORDER BY
+			DATE_FORMAT(
+				statics.create_time,
+				'%m-%d-%Y'
+			) DESC,
+			info.id
+	</select>
+	
+	<select id="select" parameterType="map" resultMap="orderMap">
+		SELECT
+			o.*, sku.operator sku_operator,
+			sku.rent_type sku_rent_type,
+			sku.scope_cid sku_scope_cid
+		FROM
+			view_order o
+		LEFT JOIN info_sku sku ON o.sku_id = sku.id
+		<where>
+			<foreach collection="param" item="item" index="key" separator="and" >
+				<if test="key != 'state' and key != 'startTime' and key != 'endTime'">
+				${key}=#{item}
+				</if>
+			</foreach>
+			<if test="param.state != null">
+				and supplier_report_success=#{param.state}
+			</if>
+			<if test="param.startTime != null">
+				and create_time &gt;= #{param.startTime}
+			</if>
+			<if test="param.endTime != null">
+				and create_time &lt;= #{param.endTime}
+			</if>
+		</where> 
+		order by create_time desc
+	</select>
+	
+	<resultMap type="com.ziyuan.web.manager.domain.OrderStatisticBean" id="statisticByTimeMap">
+		<result property="distributor_price" column="distributor_price" />
+		<result property="supplier_price" column="supplier_price" />
+		<result property="standard_price" column="standard_price" />
+		<result property="count" column="count" />
+	</resultMap>
+	
+	<select id="statisticByTime" parameterType="map" resultMap="statisticByTimeMap">
+		select 
+			SUM(o.distributor_price) distributor_price,
+			SUM(o.supplier_price) supplier_price,
+			SUM(o.standard_price) standard_price,
+			count(0) count
+		from 
+			view_order o
+		left join info_sku sku on o.sku_id=sku.id
+		<where>
+			<foreach collection="param" item="item" index="key" separator="and" >
+				<if test="key != 'state' and key != 'startTime' and key != 'endTime'">
+				${key}=#{item}
+				</if>
+			</foreach>
+			<if test="param.startTime != null">
+				and create_time &gt;= #{param.startTime}
+			</if>
+			<if test="param.endTime != null">
+				and create_time &lt;= #{param.endTime}
+			</if>
+		</where> 
+	</select>
+	
+	<select id="export" parameterType="map" resultMap="orderMap">
+		SELECT
+			o.*, sku.operator sku_operator,
+			sku.rent_type sku_rent_type,
+			sku.scope_cid sku_scope_cid
+		FROM
+			view_order o
+		LEFT JOIN info_sku sku ON o.sku_id = sku.id
+		<where>
+			<foreach collection="param" item="item" index="key" separator="and" >
+				<if test="key != 'state' and key != 'startTime' and key != 'endTime' ">
+				${key}=#{item}
+				</if>
+			</foreach>
+			<if test="param.state != null">
+				<if test="param.state ==80 or param.state == 81 ">
+					and supplier_report_success=#{param.state}
+				</if>
+				<if test="param.state == 404 ">
+					and supplier_report_success != 80 and supplier_report_success != 81
+				</if>
+			</if>
+			<if test="param.startTime != null">
+				and create_time &gt;= #{param.startTime}
+			</if>
+			<if test="param.endTime != null">
+				and create_time &lt;= #{param.endTime}
+			</if>
+		</where> 
+		order by create_time
+	</select>
+
+	<!-- 首页 线图 -->
+	<select id="selectIndexChartLineToday" parameterType="map" resultType="com.ziyuan.web.manager.domain.ChartLineQueueOrderBean">
+		select HOUR(create_time) hour,count(0) as counts from view_order
+		where create_time >=date_format(now(),'%Y-%m-%d 00:00:00')
+		group by HOUR(create_time)	order by HOUR(create_time)
+	</select>
+	
+	<select id="selectIndexChartLineYesterday" parameterType="map" resultType="com.ziyuan.web.manager.domain.ChartLineQueueOrderBean">
+		select HOUR(create_time) hour,count(0) as counts from view_order
+		where create_time &gt;=date_format(DATE_SUB(now(),INTERVAL 1 DAY),'%Y-%m-%d 00:00:00')
+		and create_time &lt; date_format(now(),'%Y-%m-%d 00:00:00')
+		group by HOUR(create_time)	order by HOUR(create_time)
+	</select>
+	
+	<select id="selectIndexChartPieGroupByStatusPush" parameterType="map" resultType="map">
+		SELECT
+			count(0) AS counts,
+			supplier_report_success
+		FROM
+			view_order o
+		INNER JOIN info_sku sku ON o.sku_id = sku.id
+		<where>
+			<if test="start != null">
+				o.create_time &gt;=#{start}
+			</if>
+			<if test="end != null">
+				and o.create_time &lt;=#{end}
+			</if>
+			<if test="operator != null">
+				and sku.operator &lt;=#{operator}
+			</if>
+			<if test="provinceid != null">
+				and sku.provinceid &lt;=#{provinceid}
+			</if>
+		</where>
+		group by o.supplier_report_success
+	</select>
+	
+	<select id="selectByOrderNo" parameterType="string" resultType="com.ziyuan.web.manager.domain.OrderReportBean">
+		select * from view_order where order_no=#{order_no}
+	</select>
+	
+	
+	<update id="update" parameterType="order">
+		update order_status set supplier_report_success = #{supplier_report_success} where order_no=#{order_no}
+	</update>
+	
+	<!-- 统计每月渠道消耗量 -->
+	<select id="selectOrderDistributorPrice" resultType="map">
+		select distributor_id,sum(standard_price) price from view_order 
+		where create_time &gt;=#{starttime} and create_time &lt;=#{endtime}
+		group by distributor_id
+	</select>
+	
+	<select id="totalCount" parameterType="map" resultType="Integer">
+		SELECT
+			count(*)
+		FROM
+			view_order o
+		LEFT JOIN info_sku sku ON o.sku_id = sku.id
+		LEFT JOIN info_province p ON p.provinceid = sku.provinceid
+		LEFT JOIN info_constant c ON sku.scope_cid = c.id
+		<where>
+			<foreach collection="param" item="item" index="key" separator="and" >
+				<if test="key != 'state' and key != 'startTime' and key != 'endTime'">
+				${key}=#{item}
+				</if>
+			</foreach>
+			<if test="param.state != null">
+				<if test="param.state ==80 or param.state == 81 ">
+					and supplier_report_success=#{param.state}
+				</if>
+				<if test="param.state == 404 ">
+					and supplier_report_success != 80 and supplier_report_success != 81
+				</if>
+			</if>
+			<if test="param.startTime != null">
+				and create_time &gt;= #{param.startTime}
+			</if>
+			<if test="param.endTime != null">
+				and create_time &lt;= #{param.endTime}
+			</if>
+		</where>
+	</select>
+	
+	<select id="listSupplierStaticsReportMonthly" parameterType="map" resultType="com.ziyuan.web.manager.domain.OrderBean">
+		select statics.create_time,info.id supplier_id,info.name supplier_name,sku.sku,p.province,operator,c.name scope_name,statics.count,statics.bid,statics.sales,statics.standard from
+
+		(select create_time,supplier_id,sku_id
+		,count(*) count,sum(distributor_price) sales,sum(supplier_price) bid,sum(standard_price) standard from `order` where supplier_report_success = 80
+		group by DATE_FORMAT(create_time,'%m-%Y'),supplier_id,sku_id) statics
+		inner join info_sku sku on sku.id=statics.sku_id
+		inner join info_supplier info on info.id=statics.supplier_id
+		left join info_constant c on sku.scope_cid=c.id
+		left join info_province p on sku.provinceid=p.provinceid
+		<where>
+			<if test="supplier_name != null">
+				info.name like '%${supplier_name}%'
+			</if>
+			<if test="sku != null">
+				and sku.sku like '%${sku}%'
+			</if>
+			<if test="startTime != null">
+				and statics.create_time <![CDATA[  >=  ]]> '${startTime}-01 00:00:00'
+			</if>
+			<if test="endTime != null">
+				and statics.create_time <![CDATA[  <  ]]> '${endTime} 00:00:00'
+			</if>
+		</where> 
+		order by DATE_FORMAT(statics.create_time,'%m-%Y') desc,info.id
+	</select>
+	
+	<select id="selectByPage" parameterType="map" resultMap="orderMap">
+		SELECT
+			o.*, sku.operator sku_operator,
+			sku.rent_type sku_rent_type,
+			sku.scope_cid sku_scope_cid
+		FROM
+			view_order o
+		LEFT JOIN info_sku sku ON o.sku_id = sku.id
+		<where>
+			<foreach collection="param" item="item" index="key" separator="and" >
+				<if test="key != 'state' and key != 'startTime' and key != 'endTime'">
+				${key}=#{item}
+				</if>
+			</foreach>
+			<if test="param.state != null">
+				<if test="param.state ==80 or param.state == 81 ">
+					and supplier_report_success=#{param.state}
+				</if>
+				<if test="param.state == 404 ">
+					and supplier_report_success != 80 and supplier_report_success != 81
+				</if>
+			</if>
+			<if test="param.startTime != null">
+				and create_time &gt;= #{param.startTime}
+			</if>
+			<if test="param.endTime != null">
+				and create_time &lt;= #{param.endTime}
+			</if>
+		</where> 
+		
+	</select>
+	
+	<resultMap type="com.ziyuan.web.manager.domain.CountTodayBean" id="countToday">
+		<result property="count" column="count" />
+		<result property="distributor_sum" column="distributor_sum" />
+		<result property="supplier_sum" column="supplier_sum" />
+	</resultMap>
+	
+	<select id="selectCountToday" parameterType="map" resultMap="countToday">
+		SELECT
+			count(0) count,
+			SUM(distributor_price*distributor_discount) distributor_sum,
+			SUM(supplier_price*supplier_discount) supplier_sum
+		FROM
+			view_order
+		WHERE
+			create_time >= #{start}
+	</select>
+
+</mapper>

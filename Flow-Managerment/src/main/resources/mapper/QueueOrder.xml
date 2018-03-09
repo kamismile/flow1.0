@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.QueueOrderMapper">
+
+	<select id="select" parameterType="map" resultType="com.ziyuan.web.manager.domain.OrderReportBean" >
+		select 
+			* 
+		from 
+			view_order queue
+			LEFT JOIN info_sku sku on queue.sku_mask = sku.sku 
+			LEFT JOIN info_distributor dis on queue.distributor_code = dis.`code`
+		<where>
+			supplier_report_success=91
+			<if test="supplier_id != null">
+				and queue.supplier_id = #{supplier_id}
+			</if>
+			<if test="supplier_code_id != null">
+				and queue.supplier_code_id = #{supplier_code_id}
+			</if>
+			
+			<if test="client_order_no != null">
+				and queue.client_order_no = #{client_order_no}
+			</if>
+			<if test="order_no != null">
+				and queue.order_no = #{order_no}
+			</if>
+			<if test="phone != null">
+				and queue.phone = #{phone}
+			</if>
+			<if test="distributor_code != null">
+				and dis.id = #{distributor_code}
+			</if>
+			<if test="start != null">
+				and queue.process_time &gt;= #{start}
+			</if>
+			<if test="end != null">
+				and queue.process_time &lt;= #{end}
+			</if>
+			<if test="provinceid != null">
+				and queue.provinceid = #{provinceid}
+			</if>
+			<if test="rent_type != null">
+				and sku.rent_type = #{rent_type}
+			</if>
+		</where>
+	</select>
+	
+	<delete id="delete" parameterType="int">
+		delete from view_order where id = #{id}
+	</delete>
+	
+	<update id="update" parameterType="int" >
+
+	</update>
+	
+	<update id="resetCacheOne" parameterType="com.ziyuan.web.manager.domain.OrderReportBean">
+		update view_order set supplier_report_success=0,send_time=now() where id=#{id}
+	</update>
+	
+	<update id="pushFail" parameterType="com.ziyuan.web.manager.domain.OrderReportBean">
+		update view_order set supplier_report_success=0,send_time=now(),retries=-1 where id=#{id}
+	</update>
+	
+	<update id="resetCache" >
+		update info_supplier set cache_mode=0 where id=#{supplier_id}
+	</update>
+	<update id="resetCacheCodetable" >
+		update info_supplier_codetable set cache_mode=0 where id=#{supplier_code_id}
+	</update>
+	
+	<select id="cacheCount" parameterType="int" resultType="int">
+		select count(0) from view_order where supplier_id=#{supplier_id} and supplier_report_success=91
+	</select>
+	
+	<insert id="insert" parameterType="com.ziyuan.web.manager.domain.OrderReportBean">
+		insert into view_order(client_order_no,sku_mask,distributor_code,phone,pkg_type,provinceid,
+			order_no,source,consumer,connection_id,retries,supplier_sort,send_time,notify_url)
+		values(#{client_order_no},#{sku_mask},#{distributor_code},#{phone},#{pkg_type},#{provinceid},
+			#{order_no},#{source},#{consumer},#{connection_id},#{retries},#{supplier_sort},#{send_time},#{notify_url})
+	</insert>
+	
+	<select id="selectBySupplierId" parameterType="int" resultType="com.ziyuan.web.manager.domain.OrderReportBean">
+		SELECT
+			*
+		FROM
+			view_order
+		WHERE
+			supplier_id = #{supplier_id}
+			AND supplier_report_success = 91
+	</select>
+	
+	<select id="selectBySupplierCodeId" parameterType="int" resultType="com.ziyuan.web.manager.domain.OrderReportBean">
+		SELECT
+			*
+		FROM
+			view_order
+		WHERE
+			supplier_code_id = #{supplier_code_id}
+			AND supplier_report_success = 91
+	</select>
+	
+	<select id="selectByOrderNo" parameterType="string" resultType="com.ziyuan.web.manager.domain.OrderReportBean">
+		SELECT
+			*
+		FROM
+			view_order
+		WHERE
+			order_no = #{order_no}
+			AND supplier_report_success = 91
+	</select>
+</mapper>

@@ -1,0 +1,47 @@
+spring:
+  application:
+   name: queue-order-submit
+  profiles:
+    active: dev
+  
+  redis:
+    database: 1
+        
+management:
+  security:
+    enabled: false
+
+feign:
+  hystrix:
+    enabled: true
+
+server:
+  port: 8090
+
+logging:
+  level:
+    console: debug
+    sys: debug
+    error: debug
+    request: debug
+    http: debug
+
+rest:
+  connection:
+    connect-timeout: 5000
+    connection-request-timeout: 5000
+    read-timeout: 5000
+    
+system:
+  platform:
+    name: cc
+  supplier:
+    pool-thread-num: 50
+  groovy:
+    directorys: file:///Users/yaohu/Documents/gitRepository/FlowPlatform2/Flow-Queue-SupplierReport/src/main/resources/groovy/
+    
+  useRabbitNoti:
+    order: true
+
+
+    

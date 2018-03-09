@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.InfoSkuMapper">
+
+	<resultMap type="com.ziyuan.web.manager.domain.InfoSkuBean" id="infoSkuMap">
+		<id column="id" property="id" />
+		<result column="type_cid" property="type_cid"/>
+		<result column="remark" property="remark"/>
+		<result column="sku" property="sku"/>
+		<result column="name" property="name"/>
+		<result column="operator" property="operator"/>
+		<result column="provinceid" property="provinceid"/>
+		<result column="standard_price" property="standard_price"/>
+		<result column="scope_cid" property="scope_cid"/>
+		<result column="enabled" property="enabled"/>
+		<result column="update_time" property="update_time"/>
+		<result column="update_user" property="update_user"/>
+		<result column="via_attribute" property="via_attribute"/>
+		<result column="pkgsize" property="pkgsize"/>
+		<result column="info_ptype" property="info_ptype"/>
+		<result column="info_net" property="info_net"/>
+		<result column="info_expiry" property="info_expiry"/>
+		<result column="info_effective" property="info_effective"/>
+		<result column="info_limit" property="info_limit"/>
+		<result column="rent_type" property="rent_type"/>
+		<result column="sku_type" property="sku_type"/>
+		<result column="sku_param" property="sku_param"/>
+		<result column="sku_type_name" property="sku_type_name"/>
+		
+		<collection property="relate_common_infoSupplier" column="id" ofType="com.shziyuan.flow.global.domain.flow.InfoSupplier" select="selectCommonSupplier">
+			<result column="name" property="name"/>
+		</collection>
+			
+		<collection property="relate_present_infoSupplier" column="id" ofType="com.shziyuan.flow.global.domain.flow.InfoSupplier" select="selectPresentSupplier" >
+			<result column="name" property="name"/>
+		</collection>
+	</resultMap>
+	<!-- 分页查询产品信息 -->
+	<select id="selectAll" parameterType="map" resultMap="infoSkuMap" >
+		SELECT 
+			sku.*, con.`name` sku_type_name
+		from info_sku sku
+		LEFT JOIN info_constant con on con.id = sku.sku_type
+		<where>
+			<if test="operator != null">
+				operator = #{operator}
+			</if>
+			<if test="scope_cid != null">
+				and scope_cid = #{scope_cid}
+			</if>
+			<if test="enabled != null">
+				and enabled = #{enabled}
+			</if>
+			<if test="provinceid != null">
+				and provinceid = #{provinceid}
+			</if>
+			<if test="name != null">
+				and sku.`name` like '%${name}%'
+			</if>
+			<if test="rent_type != null">
+				and rent_type = #{rent_type}
+			</if>
+			<if test="sku_type != null">
+				and sku_type = #{sku_type}
+			</if>
+		</where>
+	</select>
+	
+	<resultMap type="com.shziyuan.flow.global.domain.flow.InfoSupplier" id="commonSupplierMap">
+		<id column="id" property="id" />
+		<result column="name" property="name"/>
+	</resultMap>
+	
+	<select id="selectCommonSupplier" resultMap="commonSupplierMap" parameterType="Integer">
+		SELECT 
+			DISTINCT info.name
+		from info_sku sku
+		LEFT JOIN bind_supplier sup ON sku.id = sup.sku_id
+		LEFT JOIN info_supplier info ON sup.supplier_id = info.id
+		
+		WHERE sku.id = #{id}
+	</select>
+	
+	<resultMap type="com.shziyuan.flow.global.domain.flow.InfoSupplier" id="presentSupplierMap">
+		<id column="id" property="id" />
+		<result column="name" property="name"/>
+	</resultMap>
+	
+	<select id="selectPresentSupplier" resultMap="presentSupplierMap" parameterType="Integer">
+		SELECT 
+			DISTINCT infoPre.name
+		from info_sku sku
+		LEFT JOIN bind_supplier_present pre on sku.id = pre.sku_id
+		LEFT JOIN info_supplier infoPre ON pre.supplier_id = infoPre.id
+		WHERE sku.id = #{id}
+	</select>
+	
+	<select id="selectByIds" parameterType="list" resultType="infoSku">
+		select * from info_sku where id in <foreach item="item" collection="list" open="(" separator="," close=")">#{item}</foreach>
+	</select>
+	
+	<select id="selectOne" parameterType="int" resultType="infoSku">
+		select * from info_sku where id=#{id}
+	</select>
+	
+	<select id="export" parameterType="map" resultType="infoSku" >
+		select * from info_sku sku
+		<where>
+			<if test="operator != null">
+				operator = #{operator}
+			</if>
+			<if test="scope_cid != null">
+				and scope_cid = #{scope_cid}
+			</if>
+			<if test="enabled != null">
+				and enabled = #{enabled}
+			</if>
+			<if test="provinceid != null">
+				and provinceid = #{provinceid}
+			</if>
+			<if test="name != null">
+				and name like '%${name}%'
+			</if>
+			<if test="rent_type != null">
+				and rent_type = #{rent_type}
+			</if>
+			<if test="sku_type != null">
+				and sku_type = #{sku_type}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 根据id删除产品 -->
+	<delete id="delete" parameterType="int">
+		delete from info_sku where id = #{id}
+	</delete>
+	
+	<!-- 修改产品 -->
+	<update id="update" parameterType="infoSku" >
+		update info_sku set sku=#{sku},operator=#{operator},provinceid=#{provinceid},
+			standard_price=#{standard_price},scope_cid=#{scope_cid},enabled=#{enabled},
+			pkgsize=#{pkgsize},info_ptype=#{info_ptype},info_net=#{info_net},
+			info_expiry=#{info_expiry}, info_effective=#{info_effective},info_limit=#{info_limit},
+			update_time=#{update_time},update_user=#{update_user},name=#{name},rent_type=#{rent_type},sku_type=#{sku_type}
+		where id=#{id}
+	</update>
+	
+	<!-- 添加产品 -->
+	<insert id="insert" parameterType="infoSku" useGeneratedKeys="true" keyProperty="id">
+		insert into info_sku(sku,operator,provinceid,standard_price,scope_cid,
+			remark,enabled,type_cid,pkgsize,info_ptype,info_net,info_expiry,info_effective,
+			info_limit,update_time,update_user,name,rent_type,sku_type) 
+		values(#{sku},#{operator},#{provinceid},#{standard_price},#{scope_cid},
+			#{remark},#{enabled},#{type_cid},#{pkgsize},#{info_ptype},#{info_net},#{info_expiry},#{info_effective},
+			#{info_limit},#{update_time},#{update_user},#{name},#{rent_type},#{sku_type})
+	</insert>
+	
+	<!-- TREE -->
+	<resultMap type="com.ziyuan.web.manager.domain.TreeBindBean" id="treeMap">
+		<id column="operator" property="name" />
+		<result column="operator" property="name"/>
+		<collection property="childs" ofType="com.ziyuan.web.manager.domain.TreeBindBean">
+			<id column="provinceid" property="id" />
+			<result column="province" property="name"/>
+			<collection property="childs" ofType="com.ziyuan.web.manager.domain.TreeBindBean">
+				<id column="scope_cid" property="id"/>
+				<result column="scope_name" property="name" />
+				<result column="discount_min" property="discount_min"/>
+				<result column="count" property="count"/>
+			</collection>
+		</collection>
+	</resultMap>
+	<select id="selectTreeInSku" resultMap="treeMap">
+		select bind.*,pv.province,ic.name scope_name
+		from (
+		select operator,provinceid,scope_cid,min(standard_price) discount_min,count(0) count
+		from info_sku
+		group by operator,provinceid,scope_cid ) bind
+		left join info_province pv on bind.provinceid=pv.provinceid
+		left join info_constant ic on bind.scope_cid=ic.id
+		order by bind.operator,bind.provinceid,bind.scope_cid
+	</select>
+	
+	<resultMap type="com.ziyuan.web.manager.domain.TreeBindBean" id="treeMap2">
+		<id column="operator" property="name" />
+		<result column="operator" property="name"/>
+		<collection property="childs" ofType="com.ziyuan.web.manager.domain.TreeBindBean">
+			<id column="provinceid" property="id" />
+			<result column="provinceid" property="name"/>
+			<collection property="childs" ofType="com.ziyuan.web.manager.domain.TreeBindBean">
+				<id column="id" property="id"/>
+				<result column="name" property="name" />
+				<result column="sku" property="operator" />
+			</collection>
+		</collection>
+	</resultMap>
+	<select id="selectTreeInSku2" resultMap="treeMap2">
+		select id,sku,name,provinceid,operator from info_sku
+	</select>
+	
+	<select id="getCountBySKU" parameterType="String" resultType="Integer" >
+		select count(*) from info_sku where sku=#{sku}
+	</select>
+	
+	<update id="updateSkuParam" parameterType="infoSku">
+		UPDATE info_sku
+		SET sku_param = #{sku_param}
+		WHERE
+			id = #{id}
+	</update>
+</mapper>

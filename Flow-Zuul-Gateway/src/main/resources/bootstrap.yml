@@ -1,0 +1,19 @@
+spring:
+  application:
+   name: zuul-service
+   
+server:
+  port: 8999
+ 
+zuul: 
+  routes: 
+    dwi: 
+      path: /dwi/**
+      serviceId: dwi
+      strip-prefix: true
+    managerment: 
+      path: /managerment/**
+      serviceId: managerment
+      strip-prefix: true
+    
+   

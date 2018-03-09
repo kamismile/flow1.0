@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ziyuan.web.manager.dao.QueueSupplierReportActiveMapper">
+	
+	<select id="selectByOrderNo" parameterType="String" resultType="com.ziyuan.web.manager.domain.QueueSupplierReportActiveBean">
+		select * from queue_supplier_report_active where order_no=#{order_no}
+	</select>
+	
+	<select id="select" parameterType="map" resultType="com.ziyuan.web.manager.domain.QueueSupplierReportActiveBean">
+		select o.*,p.province,sku.operator,c.name scope_name,sku.rent_type,sku.pkgsize from queue_supplier_report_active o
+		left join info_sku sku on o.sku_id=sku.id
+		left join info_province p on p.provinceid = sku.provinceid
+		left join info_constant c on sku.scope_cid=c.id
+		<where>
+			retries > 0
+			<if test="distributor_name != null">
+				and distributor_name like '%${distributor_name}%'
+			</if>
+			<if test="supplier_name != null">
+				and supplier_name like '%${supplier_name}%'
+			</if>
+			<if test="order_no != null">
+				and order_no = #{order_no}
+			</if>
+			<if test="client_order_no != null">
+				and client_order_no = #{client_order_no}
+			</if>
+			<if test="phone != null">
+				and phone = #{phone}
+			</if>
+			<if test="operator != null">
+				and sku.operator = #{operator}
+			</if>
+			<if test="provinceid != null">
+				and sku.provinceid = #{provinceid}
+			</if>
+			<if test="startTime != null">
+				and insert_time <![CDATA[  >=  ]]> #{startTime}
+			</if>
+			<if test="endTime != null">
+				and insert_time <![CDATA[  <  ]]> #{endTime}
+			</if>
+		</where>
+		order by process_time desc
+	</select>
+	
+	<update id="update" parameterType="com.ziyuan.web.manager.domain.QueueSupplierReportActiveBean">
+		update queue_supplier_report_active set retries = #{retries},send_time=#{send_time},status=#{status}
+		where order_no = #{order_no}
+	</update>
+	
+	<update id="updateInOperation" parameterType="queueSupplierReportActive">
+		update queue_supplier_report_active set retries = #{retries},send_time=#{send_time},status=#{status},mark=#{mark}
+		where order_no = #{order_no}
+	</update>
+	
+	<delete id="deleteByOrderNo" parameterType="String">
+		delete from queue_supplier_report_active where order_no = #{order_no}
+	</delete>
+	
+	<insert id="insertByArchive" parameterType="com.ziyuan.web.manager.domain.ArchiveSupplierReportActive">
+		insert into queue_supplier_report_active
+		select null,client_order_no,sku_mask,distributor_code,phone,pkg_type,provinceid,order_no,
+		source,consumer,if_attribute,connection_id,#{status},process_time,insert_time,
+		send_time,sku_id,sku,supplier_id,supplier_name,supplier_code_id,supplier_code_name,
+		standard_price,supplier_discount,supplier_price,distributor_discount,distributor_price,
+		distributor_id,distributor_name,#{retries},#{mark},notify_url,supplier_sort
+		from archive_supplier_report_active where id=#{id}
+	</insert>
+	
+	<insert id="insertByOrder" parameterType="queueSupplierReportActive">
+		insert into queue_supplier_report_active
+		select null,client_order_no,sku_mask,distributor_code,phone,pkg_type,provinceid,order_no,
+		#{source},#{consumer},#{if_attribute},#{connection_id},#{status},process_time,create_time,
+		#{send_time},sku_id,sku,supplier_id,supplier_name,supplier_code_id,supplier_code_name,
+		standard_price,supplier_discount,supplier_price,distributor_discount,distributor_price,
+		distributor_id,distributor_name,#{retries},#{mark},notify_url,#{supplier_sort}
+		from `order` where order_no=#{order_no}
+	</insert>
+</mapper>

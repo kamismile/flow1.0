@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.OrderReportMapper">
+	<select id="selectOrderTimesharing" resultType="com.ziyuan.web.manager.domain.report.OrderTimesharingResultset">
+		select p_day,p_hour,distributor_name,sum(distributor_price) price from (
+		select date_format(process_time,'%Y-%m-%d') p_day,HOUR(process_time) p_hour,
+			distributor_name,distributor_price from view_order 
+		<where>
+			<if test="start != null">
+				process_time &gt;= #{start}
+			</if>
+			<if test="end != null">
+				and process_time &lt;= #{end}
+			</if>
+		</where>
+			) o
+		group by p_day,p_hour,distributor_name
+		order by p_day,p_hour,distributor_name
+	</select>
+</mapper>

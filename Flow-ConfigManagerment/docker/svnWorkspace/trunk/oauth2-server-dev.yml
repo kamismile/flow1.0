@@ -1,0 +1,27 @@
+ldap:
+  userBaseDN: "ou=users,dc=shziyuan,dc=com"
+  authGroupBaseDN: "dc=oauth2,dc=shziyuan,dc=com"
+  server: "ldap://support.shziyuan.cn:389"
+  binder: "uid=binder,cn=javaManager,ou=group,dc=shziyuan,dc=com"
+  password: "h58g9XGD5hN90"
+  
+security:
+  oauth2:
+    resource:
+      id: user-service
+      user-info-uri: http://localhost:8763/me
+      prefer-token-info: false
+      filter-order: 3
+  
+eureka:
+ client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka/
+server:
+  port: 8763
+
+logging:
+  level:
+    org:
+      springframework:
+        security: info

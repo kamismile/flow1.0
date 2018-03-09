@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.InfoSupplierMapper" >
+  <resultMap id="BaseResultMap" type="com.ziyuan.web.manager.domain.InfoSupplierBean" >
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="report_mode" property="report_mode" />
+    <result column="create_time" property="create_time" />
+    <result column="enabled" property="enabled" />
+    <result column="update_time" property="update_time" />
+    <result column="update_user" property="update_user" />
+    <result column="process_mode" property="process_mode" />
+    <result column="if_attribute" property="if_attribute" />
+    <result column="pclass" property="pclass" />
+    <result column="platform_mark" property="platform_mark" />
+    <result column="cache_mode" property="cache_mode" />
+    
+    <association property="statisticsSupplier" javaType="com.shziyuan.flow.global.domain.flow.StatisticsSupplier">
+        <result property="daily_rate" column="daily_rate"/>
+        <result property="sales_total" column="sales_total"/>
+        <result property="sales_daily" column="sales_daily"/>
+        <result property="sales_monthly" column="sales_monthly"/>
+    </association>
+    
+    <association property="accountSupplier" javaType="com.shziyuan.flow.global.domain.flow.AccountSupplier">
+        <result property="banlance" column="banlance"/>
+        <result property="banlance_alert" column="banlance_alert"/>
+    </association>
+  </resultMap>
+  	
+	<select id="selectName" resultType="infoSupplier">
+		select id,name from info_supplier 
+	</select>
+	
+	<select id="selectById" resultType="infoSupplier" parameterType="Integer">
+		select * from info_supplier where id=#{id}
+	</select>
+	
+	<!-- 获取供应商列表-->
+  	<select id="select" resultMap="BaseResultMap" parameterType="map">
+		select info.*,
+		account.banlance,account.banlance_alert,
+		ss.daily_rate,ss.sales_total,ss.sales_daily,ss.sales_daily,ss.sales_monthly
+		from info_supplier info 
+		inner join account_supplier account on info.id=account.supplier_id
+		inner join statistics_supplier ss on info.id=ss.supplier_id
+		<where>
+			<if test="name != null">  
+	              info.name like '%${name}%'
+	        </if> 
+	        <if test="enabled != null">  
+	              AND info.enabled=#{enabled}
+	        </if>
+		</where>
+	</select>
+	
+	<!-- 用于供应商缓存开关 -->
+	<resultMap id="cacheResultMap" type="com.ziyuan.web.manager.domain.InfoSupplierWithCodetableBean" >
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="report_mode" property="report_mode" />
+    <result column="enabled" property="enabled" />
+    <result column="process_mode" property="process_mode" />
+    <result column="cache_mode" property="cache_mode" />
+    
+    <collection property="codetable" ofType="com.ziyuan.web.manager.domain.InfoSupplierCodetableBean">
+        <id column="ct_id" property="id" />
+        <result column="ct_provinceid" property="provinceid"/>
+        <result column="ct_operator" property="operator"/>
+        <result column="ct_scope_cid" property="scope_cid"/>
+        <result column="ct_code" property="code"/>
+        <result column="ct_name" property="name"/>
+        <result column="ct_discount" property="discount"/>
+        <result column="ct_price" property="price"/>
+        <result column="ct_enabled" property="enabled"/>
+    </collection>
+  </resultMap>
+	
+	<select id="selectUseCache" resultMap="cacheResultMap" parameterType="map">
+		select info.*,
+		ct.provinceid ct_provinceid,ct.operator ct_operator,ct.scope_cid ct_scope_cid,
+		ct.id ct_id,ct.code ct_code,ct.name ct_name,ct.discount ct_discount,ct.price ct_price,ct.enabled ct_enabled
+		from (
+			select * from info_supplier
+			<where>
+			<if test="name != null">
+	              name like '%${name}%'
+	        </if>
+			</where> limit ${pageno},${rows}) info
+		left join info_supplier_codetable ct on info.id=ct.supplier_id
+	</select>
+	<select id="selectUseCacheCount" resultType="int" parameterType="map">
+		select count(0) from info_supplier info
+		<where>
+		<if test="name != null">
+              info.name like '%${name}%'
+        </if>
+		</where>
+	</select>
+	
+	<update id="updateCacheTable" parameterType="infoSupplier">
+		update info_supplier set cache_mode=#{cache_mode} where id=#{id}
+	</update>
+	
+	<!-- 删除供应商-->
+	<delete id="delete" parameterType="int">
+		delete from info_supplier where id = #{id}
+	</delete>
+	
+	<!-- 新增供应商-->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="infoSupplier">
+		insert into info_supplier (name,report_mode,create_time,enabled,update_time,update_user,process_mode,platform_mark) 
+        values (#{name},#{report_mode},#{create_time},#{enabled},#{update_time},#{update_user},#{process_mode},#{platform_mark})
+	</insert>
+	
+  	<!-- 修改供应商信息-->
+	<update id="update" parameterType="infoSupplier">
+		update info_supplier set name = #{name},report_mode = #{report_mode},enabled = #{enabled},
+			update_time = #{update_time},update_user = #{update_user},process_mode = #{process_mode},
+			pclass = #{pclass},platform_mark=#{platform_mark}
+		where id = #{id}
+	</update>
+	
+	<resultMap id="exportMap" type="com.ziyuan.web.manager.domain.InfoSupplierBean" extends="BaseResultMap">
+	    <collection property="codetable" ofType="com.ziyuan.web.manager.domain.InfoSupplierCodetableBean">
+	    	<result property="province" column="ct_province" />
+	    	<result property="operator" column="ct_operator" />
+	    	<result property="scope_name" column="ct_scope_name" />
+	    	<result property="code" column="ct_code" />
+	    	<result property="name" column="ct_name" />
+	    	<result property="discount" column="ct_discount" />
+	    	<result property="price" column="ct_price" />
+	    	<result property="enabled" column="ct_enabled" />
+	    </collection>
+	</resultMap>
+	  
+	<select id="export" parameterType="map" resultMap="exportMap">
+		select info.*,
+		account.banlance,account.banlance_alert,
+		ss.daily_rate,ss.sales_total,ss.sales_daily,ss.sales_monthly,
+		p.province ct_province,ct.operator ct_operator,c.name ct_scope_name,ct.code ct_code,ct.name ct_name,ct.discount ct_discount,ct.price ct_price,ct.enabled ct_enabled
+		from info_supplier info 
+		inner join account_supplier account on info.id=account.supplier_id
+		inner join statistics_supplier ss on info.id=ss.supplier_id
+		left join info_supplier_codetable ct on info.id=ct.supplier_id
+		left join info_constant c on ct.scope_cid=c.id
+		left join info_province p on ct.provinceid=p.provinceid
+		<where>
+			<if test="name != null">
+	              info.name like '%${name}%'
+	        </if>
+	        <if test="enabled != null">  
+	              AND info.enabled=#{enabled}
+	        </if>
+		</where>
+	</select>
+	
+	<!-- 修改供应商信息-->
+	<update id="updateSupplierInfoAttribute" parameterType="com.shziyuan.flow.global.domain.flow.InfoSupplier">
+		update info_supplier set if_attribute=#{if_attribute},pclass=#{pclass}
+		where id=#{id}
+	</update>
+	
+	<update id="updateCacheState" parameterType="int">
+		update info_supplier set cache_mode = 0
+	</update>
+	
+</mapper>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ziyuan.web.manager.dao.InfoDistributorMapper">
+<resultMap id="BaseResultMap" type="com.ziyuan.web.manager.domain.InfoDistributorBean" >
+    <id column="id" property="id" />
+    <result column="enabled" property="enabled" />
+    <result column="name" property="name" />
+    <result column="code" property="code" />
+    <result column="info_company_name" property="info_company_name" />
+    <result column="info_contact" property="info_contact" />
+    <result column="info_tel" property="info_tel" />
+    <result column="info_email" property="info_email" />
+    <result column="create_time" property="create_time" />
+    <result column="update_time" property="update_time" />
+    <result column="update_user" property="update_user" />
+    <result column="report_url" property="report_url" />
+    <result column="need_actively" property="need_actively" />
+    <result column="key" property="key" />
+    <result column="verify" property="verify" />
+    <result column="from_cityid" property="from_cityid" />
+    <result column="from_channel" property="from_channel" />
+    <result column="source" property="source" />
+    
+    <association property="statisticsDistributor" javaType="com.shziyuan.flow.global.domain.flow.StatisticsDistributor">
+        <result property="consumer_total" column="consumer_total"/>
+        <result property="consumer_daily" column="consumer_daily"/>
+        <result property="consumer_monthly" column="consumer_monthly"/>
+    </association>
+    
+    <association property="accountDistributor" javaType="com.shziyuan.flow.global.domain.flow.AccountDistributor">
+        <result property="banlance" column="banlance"/>
+        <result property="banlance_alert" column="banlance_alert"/>
+        <result property="credit" column="credit"/>
+        <result property="receivable" column="receivable"/>
+        <result property="present_banlance" column="present_banlance"/>
+    </association>
+    
+    <collection property="noticeDistributorBean" column="id" ofType="com.ziyuan.web.manager.domain.NoticeDistributorBean" select="selectNotice">
+    	<result property="notice" column="notice_name"/>
+    	<result property="url" column="notice_url"/>
+    </collection>
+  </resultMap>
+  
+  <resultMap type="com.ziyuan.web.manager.domain.NoticeDistributorBean" id="noticeMap">
+		<id column="id" property="id" />
+		<result column="notice" property="notice"/>
+		<result column="url" property="url"/>
+	</resultMap>
+  
+  <select id="selectNotice" resultMap="noticeMap">
+  	SELECT
+		*
+	FROM
+		notice_distributor
+  </select>
+  	
+	<!-- 获取运营商列表-->
+  	<select id="select" resultMap="BaseResultMap" parameterType="map">
+		select info.*,
+		account.banlance,account.banlance_alert,account.credit,account.receivable,account.present_banlance,
+		ss.consumer_total,ss.consumer_daily,ss.consumer_monthly
+		from info_distributor info 
+		inner join account_distributor account on info.id=account.distributor_id
+		inner join statistics_distributor ss on info.id=ss.distributor_id
+		<where>
+			<if test="name != null">  
+	              info.name like '%${name}%'
+	        </if> 
+	        <if test="enabled != null">  
+	              AND info.enabled=#{enabled}
+	        </if>
+	        <if test="code != null">
+	        	AND info.code=#{code}
+	        </if>
+	        <if test="verify != null">
+	        	AND info.verify=#{verify}
+	        </if>
+	        <if test="distributorID != null">  
+	            AND info.id = #{distributorID}
+	        </if>
+		</where>
+	</select>
+		
+	<!-- 删除运营商-->
+	<delete id="delete" parameterType="int">
+		delete from info_distributor where id = #{id}
+	</delete>
+	
+	<!-- 新增运营商-->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="infoDistributor">
+		insert into info_distributor (name,code,info_company_name,info_contact,info_tel,
+		info_email,create_time,enabled,update_time,update_user,report_url,need_actively,
+		`key`,verify,from_cityid,from_channel,source) 
+        values (#{name},#{code},#{info_company_name},#{info_contact},#{info_tel},
+        #{info_email},#{create_time},#{enabled},#{update_time},#{update_user},#{report_url},#{need_actively},
+        #{key},#{verify},#{from_cityid},#{from_channel},#{source})
+	</insert>
+	
+	<update id="verifySuccess" parameterType="int">
+		update info_distributor set verify = 1 where id=#{id}
+	</update>
+	<update id="verifyFaild" parameterType="int">
+		update info_distributor set verify = -1 where id=#{id}
+	</update>
+	
+	<!-- 修改运营商信息-->
+	<update id="update" parameterType="infoDistributor">
+		update info_distributor set name=#{name},code=#{code},info_company_name=#{info_company_name},
+		    info_contact=#{info_contact},info_tel=#{info_tel},info_email=#{info_email},enabled=#{enabled},
+	    	update_time=#{update_time},update_user=#{update_user},report_url=#{report_url},
+	    	need_actively=#{need_actively},`key`=#{key},from_cityid=#{from_cityid},from_channel=#{from_channel},source=#{source}
+		where id = #{id}
+	</update>
+	
+	<update id="updateUrl" parameterType="infoDistributor">
+		update info_distributor set report_url=#{report_url} where id=#{id}
+	</update>
+	
+	<select id="selectDistributorNames" resultType="com.shziyuan.flow.global.domain.flow.InfoDistributor">
+		select id,name from info_distributor
+	</select>
+	
+	<select id="selectOne" parameterType="Integer" resultMap="BaseResultMap">
+		SELECT
+			info.*, account.banlance,
+			account.banlance_alert,
+			account.credit,
+			account.receivable,
+			account.present_banlance,
+			ss.consumer_total,
+			ss.consumer_daily,
+			ss.consumer_monthly,
+			noti.notice notice_name,
+			noti.url notice_url
+		FROM
+			info_distributor info
+		INNER JOIN account_distributor account ON info.id = account.distributor_id
+		INNER JOIN statistics_distributor ss ON info.id = ss.distributor_id
+		INNER JOIN notice_distributor noti 
+		WHERE
+			info.id = #{id}
+	</select>
+	
+	<select id="selectCountByCode" parameterType="String" resultType="Integer">
+		select count(*) from info_distributor where code=#{code}
+	</select>
+	
+	<select id="selectIDByName" parameterType="string" resultType="int">
+		select id from info_distributor where name = #{name}
+	</select>
+	
+</mapper>

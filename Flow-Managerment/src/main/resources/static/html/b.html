@@ -1,0 +1,16 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>jQuery Ajax 实例演示</title>
+</head>
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+  
+<script type="text/javascript">
+$(document).ready(function(){
+	$.post("/rest/login/oauth2",{username:'james.hu',password:'9404301'},function(data) {
+		console.info(data);
+	});
+});
+
+</script>
+</html>

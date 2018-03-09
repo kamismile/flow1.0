@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.BindDistributorMapper" >
+	<resultMap id="BaseResultMap" type="com.ziyuan.web.manager.domain.BindDistributorBean" >
+		<id column="id" property="id" />
+		<result column="discount" property="discount" />
+		<result column="price" property="price" />
+		<result column="enabled" property="enabled" />
+		<result column="sku_id" property="sku_id" />
+		<result column="sku" property="sku" />
+		<result column="name" property="name" />
+		<result column="operator" property="operator" />
+		<result column="province" property="province" />
+		<result column="standard_price" property="standard_price" />
+		<result column="scope_name" property="scope_name" />
+		<result column="sku_info_ptype" property="sku_info_ptype" />
+		<result column="sku_info_net" property="sku_info_net" />
+		<result column="sku_rent_type" property="sku_rent_type" />
+		<result column="sku_type" property="sku_type" />
+		<result column="sku_param" property="sku_param" />
+	</resultMap>
+	
+	<resultMap id="bindResultMap" type="com.ziyuan.web.manager.domain.BindDistributorBean" extends="BaseResultMap">
+		<result column="sku_enabled" property="sku_enabled" />
+		<association property="distributor" javaType="infoDistributor">
+			<id column="dis_id" property="id"/>
+			<result column="dis_name" property="name"/>
+			<result column="dis_enabled" property="enabled"/>
+		</association>
+	</resultMap>
+	
+	<select id="select" resultMap="bindResultMap" parameterType="map">
+		select 
+		bind.id id,bind.discount,bind.price,bind.enabled,
+		sku.id sku_id,sku.sku,sku.operator,sku.standard_price,sku.enabled sku_enabled,
+		sku.pkgsize sku_pkgsize,sku.info_ptype sku_info_ptype,sku.info_net sku_info_net,
+		sku.rent_type sku_rent_type,vp.province,ic.name scope_name,
+		dis.id dis_id,dis.name dis_name,dis.enabled dis_enabled
+		from info_sku sku 
+		inner join bind_distributor bind on bind.pid=sku.id
+		inner join info_distributor dis on bind.distributor_id=dis.id
+		left join info_province vp on sku.provinceid=vp.provinceid
+		left join info_constant ic on sku.scope_cid = ic.id
+		<where>
+			<if test="name!=null ">
+				sku.sku like '%${name}%'
+			</if>
+			<if test="distributor_name!=null ">
+				and dis.name like '%${distributor_name}%'
+			</if>
+			<if test="provinceid!=null ">
+				AND sku.provinceid=#{provinceid}
+			</if>
+			<if test="operator != null">
+				AND sku.operator=#{operator}
+			</if>
+			<if test="scope_cid != null">
+				AND sku.scope_cid=#{scope_cid}
+			</if>
+		</where>
+		order by bind.distributor_id,sku.id,sku.operator,sku.provinceid,sku.scope_cid
+	</select>
+	
+	<select id="selectBind" resultMap="BaseResultMap" parameterType="map">
+		SELECT
+			bind.id id,
+			bind.discount,
+			bind.price,
+			bind.enabled,
+			sku.id sku_id,
+			sku. NAME,
+			sku.sku,
+			sku.operator,
+			sku.standard_price,
+			sku.pkgsize sku_pkgsize,
+			sku.info_ptype sku_info_ptype,
+			sku.info_net sku_info_net,
+			sku.rent_type sku_rent_type,
+			vp.province,
+			ic. NAME scope_name,
+			sku.sku_type,
+			sku.sku_param
+		FROM
+			info_sku sku
+		LEFT JOIN bind_distributor bind ON bind.pid = sku.id
+		AND bind.distributor_id = #{distributor_id}
+		LEFT JOIN info_province vp ON sku.provinceid = vp.provinceid
+		INNER JOIN info_constant ic ON sku.scope_cid = ic.id
+		<where>
+			<if test="name!=null ">
+				AND sku.`name` like '%${name}%'
+			</if>
+			<if test="provinceid!=null ">
+				AND sku.provinceid=#{provinceid}
+			</if>
+			<if test="operator != null and operator!=''">
+				AND sku.operator=#{operator}
+			</if>
+			<if test="scope_cid != null">
+				AND sku.scope_cid=#{scope_cid}
+			</if>
+			<if test="sku_type != null">
+				AND sku.sku_type=#{sku_type}
+			</if>
+			<if test="rent_type != null">
+				AND sku.rent_type=#{rent_type}
+			</if>
+		</where>
+		<if test="sort == 'id' and order == 'asc'">
+		order by bind.id asc
+		</if>
+		<if test="sort == 'id' and order == 'desc'">
+		order by bind.id desc
+		</if>
+		<if test="sort == 'provinceid' and order == 'asc'">
+		order by sku.provinceid asc
+		</if>
+		<if test="sort == 'provinceid' and order == 'desc'">
+		order by sku.provinceid desc
+		</if>
+		<if test="sort == 'operator' and order == 'asc'">
+		order by sku.operator asc
+		</if>
+		<if test="sort == 'operator' and order == 'desc'">
+		order by sku.operator desc
+		</if>
+		<if test="sort == 'scope_cid' and order == 'asc'">
+		order by sku.scope_cid asc
+		</if>
+		<if test="sort == 'scope_cid' and order == 'desc'">
+		order by sku.scope_cid desc
+		</if>
+		<if test="sort == 'standard_price' and order == 'asc'">
+		order by sku.standard_price asc
+		</if>
+		<if test="sort == 'standard_price' and order == 'desc'">
+		order by sku.standard_price desc
+		</if>
+	</select>
+		
+	<update id="update" parameterType="bindDistributor">
+		update bind_distributor set enabled = #{enabled},discount = #{discount},price = #{price}
+		where id=#{id}
+	</update>
+	
+	<insert id="insert" parameterType="bindDistributor">
+		insert into bind_distributor(pid,distributor_id,discount,price,enabled) 
+		values(#{pid},#{distributor_id},#{discount},#{price},#{enabled})
+	</insert>
+	
+	<delete id="delete" parameterType="int">
+		delete from bind_distributor where id=#{id}
+	</delete>
+	
+  	<select id="selectBusinessSkus" resultType="com.ziyuan.web.manager.domain.InfoSkuBean" parameterType="map">
+  		select 
+		bind.price,bind.discount,info.key,info.name distributor_name,
+		sku.id,sku.sku,sku.name,sku.pkgsize,sku.info_ptype,sku.operator,sku.standard_price,
+		sku.info_net,sku.rent_type,vp.province,ic.name scope_name
+		from info_sku sku 
+		inner join bind_distributor bind on bind.pid=sku.id
+		inner join info_distributor info on info.id = bind.distributor_id
+		left join info_province vp on sku.provinceid=vp.provinceid
+		left join info_constant ic on sku.scope_cid = ic.id
+		<where>
+			<if test="id != null ">
+				bind.distributor_id=#{id}
+			</if>
+			<if test="provinceid != null ">
+				AND sku.provinceid=#{provinceid}
+			</if>
+			<if test="scope_cid !=null ">
+				AND sku.scope_cid=#{scope_cid}
+			</if>
+			<if test="operator!=null ">
+				AND sku.operator=#{operator}
+			</if>
+			<if test="sku!=null ">
+				AND sku.sku like '%${sku}%'
+			</if>
+			<if test="username != null ">
+				AND info.`name` = #{username}
+			</if>
+			<if test="sku_type != null ">
+				AND sku.sku_type = #{sku_type}
+			</if>
+		</where>
+  	</select>
+
+	<!-- 树形筛选 -->
+	<resultMap type="com.ziyuan.web.manager.domain.TreeBindBean" id="treeMap">
+		<id column="id" property="id" />
+		<result column="name" property="name"/>
+		<collection property="childs" ofType="com.ziyuan.web.manager.domain.TreeBindBean">
+			<id column="provinceid" property="id" />
+			<result column="province" property="name"/>
+			<collection property="childs" ofType="com.ziyuan.web.manager.domain.TreeBindBean">
+				<id column="scope_cid" property="id"/>
+				<result column="scope_name" property="name" />
+				<result column="discount_min" property="discount_min"/>
+				<result column="count" property="count"/>
+			</collection>
+		</collection>
+	</resultMap>
+	<select id="selectTreeByDistributor" resultMap="treeMap">
+		select dis.id,dis.name,bind.*,pv.province,ic.name scope_name
+		from (
+		select dis.id,sku.provinceid,sku.scope_cid,min(bind.discount) discount_min,count(0) count
+		from bind_distributor bind
+		inner join info_sku sku on bind.pid=sku.id
+		inner join info_distributor dis on bind.distributor_id=dis.id
+		group by dis.id,sku.provinceid,sku.scope_cid ) bind
+		inner join info_distributor dis on bind.id=dis.id
+		left join info_province pv on bind.provinceid=pv.provinceid
+		left join info_constant ic on bind.scope_cid=ic.id
+		order by dis.id,bind.provinceid
+	</select>
+	<select id="selectTreeBySku" resultMap="treeMap">
+		select sku.id,sku.sku name,bind.*,pv.province,ic.name scope_name
+		from (
+		select sku.id,sku.provinceid,sku.scope_cid,min(bind.discount) discount_min,count(0) count
+		from bind_distributor bind
+		inner join info_sku sku on bind.pid=sku.id
+		group by sku.id,sku.provinceid,sku.scope_cid ) bind
+		inner join info_sku sku on bind.id=sku.id
+		left join info_province pv on bind.provinceid=pv.provinceid
+		left join info_constant ic on bind.scope_cid=ic.id
+		order by sku.id,bind.provinceid
+	</select>
+	
+	<resultMap type="com.ziyuan.web.manager.domain.TreeBindBean" id="treeMap2">
+		<id column="operator" property="name" />
+		<result column="operator" property="name"/>
+		<collection property="childs" ofType="com.ziyuan.web.manager.domain.TreeBindBean">
+			<id column="provinceid" property="id" />
+			<result column="provinceid" property="name"/>
+			<collection property="childs" ofType="com.ziyuan.web.manager.domain.TreeBindBean">
+				<result column="scope_cid" property="id" />
+				<result column="scope_cid" property="name" />
+				<result column="counts" property="count" />
+				<result column="discount_min" property="discount_min" />
+			</collection>
+		</collection>
+	</resultMap>
+	<select id="selectTreeInBind2" resultMap="treeMap2">
+		select sku.operator,sku.provinceid,sku.scope_cid,count(*) counts,min(bind.discount) discount_min
+		from bind_distributor bind inner join info_sku sku on bind.pid=sku.id
+		group by sku.operator,sku.provinceid,sku.scope_cid
+	</select>
+	
+	<resultMap id="treeTableMap" type="com.ziyuan.web.manager.domain.BindDistributorBean" >
+		<id column="id" property="id" />
+		<result column="discount" property="discount" />
+		<result column="price" property="price" />
+		<result column="enabled" property="enabled" />
+		<result column="sku_id" property="sku_id" />
+		<association property="skus" javaType="infoSku">
+			<id column="sku_id" property="id" />
+			<result column="sku_name" property="name" />
+			<result column="sku_sku" property="sku" />
+			<result column="sku_provinceid" property="provinceid" />
+			<result column="sku_operator" property="operator" />
+			<result column="sku_scope_cid" property="scope_cid" />
+			<result column="sku_standard_price" property="standard_price" />
+			<result column="sku_pkgsize" property="pkgsize" />
+			<result column="sku_info_ptype" property="info_ptype" />
+			<result column="sku_info_net" property="info_net" />
+			<result column="sku_rent_type" property="rent_type" />
+		</association>
+		<association property="distributor" javaType="infoDistributor">
+			<id column="dis_id" property="id" />
+			<result column="dis_name" property="name" />
+		</association>
+		<association property="change" javaType="optDistributorDiscountChange">
+			<result column="opts_discount" property="discount" />
+			<result column="opts_price" property="price" />
+			<result column="opts_effective" property="effective" />
+		</association>
+	</resultMap>
+	
+	<select id="selectTreeTable" resultMap="treeTableMap" parameterType="map">
+		select bind.*,
+		sku.id sku_id,sku.name sku_name,sku.sku sku_sku,sku.provinceid sku_provinceid,sku.operator sku_operator,
+		sku.scope_cid sku_scope_cid,sku.standard_price sku_standard_price,
+		sku.pkgsize sku_pkgsize,sku.info_ptype sku_info_ptype,sku.info_net sku_info_net,
+		sku.rent_type sku_rent_type,
+		dis.id dis_id,dis.name dis_name,
+		opts.discount opts_discount,opts.price opts_price,opts.effective opts_effective
+		from bind_distributor bind
+		inner join info_sku sku on bind.pid=sku.id
+		inner join info_distributor dis on dis.id=bind.distributor_id
+		left join opt_distributor_discount_change opts on bind.id=opts.bind_id
+		<where>
+			<if test="operator != null">
+				sku.operator=#{operator}
+			</if>
+			<if test="distributor_id != null">
+				and dis.id=#{distributor_id}
+			</if>
+			<if test="provinceid != null">
+				and sku.provinceid=#{provinceid}
+			</if>
+			<if test="scope_cid != null">
+				and sku.scope_cid=#{scope_cid}
+			</if>
+		</where>
+	</select>
+	
+	<select id="exportTreeTable" resultMap="treeTableMap" parameterType="map">
+		select bind.*,
+		sku.id sku_id,sku.name sku_name,sku.sku sku_sku,sku.provinceid sku_provinceid,sku.operator sku_operator,
+		sku.scope_cid sku_scope_cid,sku.standard_price sku_standard_price,
+		sku.pkgsize sku_pkgsize,sku.info_ptype sku_info_ptype,sku.info_net sku_info_net,
+		sku.rent_type sku_rent_type,
+		dis.id dis_id,dis.name dis_name,
+		opts.discount opts_discount,opts.price opts_price,opts.effective opts_effective
+		from bind_distributor bind
+		inner join info_sku sku on bind.pid=sku.id
+		inner join info_distributor dis on dis.id=bind.distributor_id
+		left join opt_distributor_discount_change opts on bind.id=opts.bind_id
+		<where>
+			opts.discount is NOT NULL
+			<if test="operator != null">
+				and sku.operator=#{operator}
+			</if>
+			<if test="distributor_id != null">
+				and dis.id=#{distributor_id}
+			</if>
+			<if test="provinceid != null">
+				and sku.provinceid=#{provinceid}
+			</if>
+			<if test="scope_cid != null">
+				and sku.scope_cid=#{scope_cid}
+			</if>
+		</where>
+	</select>
+
+	<!-- 重置 获取渠道bind表 -->
+	<resultMap id="bindMap2" type="com.ziyuan.web.manager.domain.BindDistributorBean2" >
+		<id column="id" property="id" />
+		<result column="discount" property="discount" />
+		<result column="price" property="price" />
+		<result column="enabled" property="enabled" />
+		<association property="distributor" javaType="infoDistributor">
+			<id column="distributor_id" property="id"/>
+			<result column="dis_name" property="name"/>
+		</association>
+		<association property="sku" javaType="infoSku">
+			<id column="pid" property="id"/>
+			<result column="sku_sku" property="sku"/>
+			<result column="sku_name" property="name"/>
+			<result column="sku_operator" property="operator"/>
+			<result column="sku_provinceid" property="provinceid"/>
+			<result column="sku_standard_price" property="standard_price"/>
+			<result column="sku_scope_cid" property="scope_cid"/>
+			<result column="sku_enabled" property="enabled"/>
+			<result column="sku_pkgsize" property="pkgsize"/>
+			<result column="sku_info_ptype" property="info_ptype"/>
+			<result column="sku_info_net" property="info_net"/>
+			<result column="sku_rent_type" property="rent_type"/>
+		</association>
+	</resultMap>
+	
+	<select id="selectBind2_binded" parameterType="map" resultMap="bindMap2">
+		select bind.id,bind.pid,bind.distributor_id,bind.discount,bind.price,bind.enabled,
+		sku.sku sku_sku,sku.name sku_name,sku.operator sku_operator,sku.provinceid sku_provinceid,
+		sku.standard_price sku_standard_price,sku.scope_cid sku_scope_cid,sku.enabled sku_enabled,
+		sku.pkgsize sku_pkgsize,sku.info_ptype sku_info_ptype,sku.info_net sku_info_net,
+		sku.rent_type sku_rent_type,
+		dis.name dis_name
+		from bind_distributor bind left join info_sku sku on bind.pid=sku.id
+		left join info_distributor dis on bind.distributor_id=dis.id
+		<where>
+			<if test="distributor_id!=null ">
+				bind.distributor_id=#{distributor_id}
+			</if>
+			<if test="name!=null ">
+				AND sku.name like '%${name}%'
+			</if>
+			<if test="operator != null">
+				AND sku.operator=#{operator}
+			</if>
+			<if test="scope_cid != null">
+				AND sku.scope_cid=#{scope_cid}
+			</if>
+			<if test="enabled != null">
+				AND bind.enabled=#{enabled}
+			</if>
+			<if test="provinceid != null">
+				and sku.provinceid=#{provinceid}
+			</if>
+			<if test="rent_type != null">
+				and sku.rent_type=#{rent_type}
+			</if>
+		</where>
+		order by bind.id
+	</select>
+	
+	<select id="selectBind2_nonbinded" parameterType="map" resultType="infoSku">
+		select sku.*
+		from info_sku sku left join bind_distributor bind on bind.pid=sku.id and bind.distributor_id=#{distributor_id}
+		<where>
+			bind.id is null
+			<if test="name!=null ">
+				AND sku.sku like '%${name}%'
+			</if>
+			<if test="provinceid!=null ">
+				AND sku.provinceid=#{provinceid}
+			</if>
+			<if test="operator != null and operator!=''">
+				AND sku.operator=#{operator}
+			</if>
+			<if test="scope_cid != null">
+				AND sku.scope_cid=#{scope_cid}
+			</if>
+			<if test="enabled != null">
+				AND sku.enabled=#{enabled}
+			</if>
+		</where>
+	</select>
+	
+	<select id="checkNull" resultType="int">
+		SELECT
+			count(0)
+		FROM
+			bind_distributor bind
+		LEFT JOIN info_distributor dis ON bind.distributor_id = dis.id
+		LEFT JOIN info_sku sku ON bind.pid = sku.id
+		WHERE
+			dis.id IS NULL
+		OR sku.id IS NULL
+		OR bind.distributor_id = 0
+		OR bind.pid = 0
+	</select>
+	
+	<select id="checkRepetion" resultType="int">
+		SELECT
+			count(0)
+		FROM
+			bind_distributor
+		WHERE
+			(
+				SELECT
+					count(0)
+				FROM
+					bind_distributor b
+				WHERE
+					bind_distributor.pid = b.pid
+				AND bind_distributor.distributor_id = b.distributor_id
+			) > 1
+	</select>
+</mapper>

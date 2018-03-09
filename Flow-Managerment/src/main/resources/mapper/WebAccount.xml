@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.WebAccountMapper">
+
+	<resultMap type="com.ziyuan.web.manager.domain.WebAccountBean" id="accountAuthMap">
+		<id column="id" property="id" />
+		<result column="username" property="username" />
+		<result column="password" property="password" />
+		<result column="enabled" property="enabled" />
+		<collection property="authorities" ofType="webAccountAuthority" select="com.ziyuan.web.manager.dao.WebAccountAuthorityMapper.selectByAccountId" column="id">
+		</collection>
+	</resultMap>
+	<select id="select" parameterType="map" resultMap="accountAuthMap">
+		select acc.id,acc.username,acc.password,acc.enabled
+		from web_account acc
+		<where>
+			<if test="username != null">
+				acc.username like '%${username}%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectByUsername" parameterType="string" resultType="webAccount" >
+		select * from web_account where username = #{username}
+	</select>
+	
+	<resultMap type="com.ziyuan.web.manager.domain.WebAccountDistributorBean" id="webAccountMap">
+		<id column="id" property="id" />
+		<result column="enabled" property="enabled" />
+		<result column="name" property="name" />
+		<result column="code" property="code" />
+		<result column="info_company_name" property="info_company_name" />
+		<result column="info_contact" property="info_contact" />
+		<result column="info_tel" property="info_tel" />
+		<result column="info_email" property="info_email" />
+		<result column="create_time" property="create_time" />
+		<result column="update_time" property="update_time" />
+		<result column="update_user" property="update_user" />
+		<result column="report_url" property="report_url" />
+		<result column="need_actively" property="need_actively" />
+		<result column="key" property="key" />
+		<association property="webAccount" javaType="webAccountDistributor">
+			<id column="distributor_id" property="distributor_id" />
+			<result column="password" property="password"/>
+			<result column="acc_enabled" property="enabled"/>
+		</association>
+	</resultMap>
+	<select id="selectDiscountByCode" parameterType="string" resultMap="webAccountMap">
+		select *,acc.enabled acc_enabled from web_account_distributor acc
+		inner join info_distributor dis on acc.distributor_id=dis.id
+		where dis.code=#{code}
+	</select>
+	
+	<delete id="delete" parameterType="int">
+		delete from web_account where id = #{id}
+	</delete>
+	
+	<update id="update" parameterType="webAccount" >
+		update web_account set username=#{username},password=#{password},enabled=#{enabled}
+		where id=#{id}
+	</update>
+	
+	<insert id="insert" parameterType="webAccount" useGeneratedKeys="true" keyProperty="id">
+		insert into web_account(username,password,enabled) values(#{username},#{password},#{enabled})
+	</insert>
+	
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.author.WebAccountAuthorityMegerMapper">
+	<resultMap id="BaseResultMap" type="com.ziyuan.web.manager.domain.author.WebAccountAuthorityMegerBean" >
+	    <id column="id" property="id" />
+	    <result property="authority" column="authority"/>
+	    <result property="description" column="description"/>
+	    <result property="enabled" column="enabled"/>
+	    <result property="create_time" column="create_time"/>
+	    <result property="update_time" column="update_time"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="com.ziyuan.web.manager.domain.author.WebAccountAuthorityMegerBean">
+		insert into 
+		web_account_authority_meger
+			(authority,
+			description,
+			enabled,
+			create_time,
+			update_time) 
+		values
+			(#{authority},
+			#{description},
+			#{enabled},
+			now(),
+			now())
+	</insert>
+	
+	<delete id="delete" parameterType="Integer">
+		delete from 
+			web_account_authority_meger 
+		where 
+			id = #{id}
+	</delete>
+	
+	<update id="update" parameterType="com.ziyuan.web.manager.domain.author.WebAccountAuthorityMegerBean">
+		update 
+			web_account_authority_meger 
+		set 
+			authority = #{authority},
+			description = #{description},
+			enabled = #{enabled},
+			update_time = now()
+		where 
+			id=#{id}
+	</update>
+	
+	<select id="select" parameterType="map" resultMap="BaseResultMap">
+		select * from web_account_authority_meger where enabled = 1
+	</select>
+	
+	<select id="selectOneAuthority" resultMap="BaseResultMap" >
+		select 
+			* 
+		from 
+			web_account_authority_meger 
+		<where>
+			<if test="description != null ">
+				description like '%${description}%'
+			</if>
+			<if test="enabled != null ">
+				<if test="enabled != 'all' ">
+					AND enabled = #{enabled}
+				</if>
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectBindAuthoritySys" parameterType="string" resultMap="BaseResultMap">
+		select 
+			aa.*
+		from 
+			
+			bind_role_authority ra
+			LEFT JOIN web_account_authority_meger aa on ra.authority_id = aa.id
+		where 
+			ra.role_id = #{role}
+	</select>
+	
+	<select id="getID" parameterType="string" resultType="int">
+		SELECT id from web_account_role_meger WHERE role = #{string}
+	</select>
+</mapper>

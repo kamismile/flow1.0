@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ziyuan.web.manager.dao.author.BindRoleAuthorityMapper">
+	<insert id="insert" parameterType="com.ziyuan.web.manager.domain.author.BindRoleAuthorityBean">
+		insert into 
+			bind_role_authority
+				(role_id,
+				authority_id)
+			values
+				(#{role_id},
+				#{authority_id})
+	</insert>
+	
+	<delete id="delete" parameterType="com.ziyuan.web.manager.domain.author.BindRoleAuthorityBean">
+		delete from 
+			bind_role_authority
+		where 
+			role_id = #{role_id}
+	</delete>
+	
+	<update id="update" parameterType="com.ziyuan.web.manager.domain.author.BindRoleAuthorityBean">
+		update 
+			bind_role_authority
+		set
+			role_id = #{role_id},
+			authority_id = #{authority_id}
+		where
+			role_id = #{role_id}
+	</update>
+</mapper>

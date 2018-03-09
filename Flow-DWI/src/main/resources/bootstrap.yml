@@ -1,0 +1,31 @@
+spring:
+  application:
+   name: dwi
+  profiles:
+    active: dev
+    
+server:
+  port: 8779
+
+logging:
+  # path: /tmp/dwi
+
+  level:
+    sys: debug
+  
+ribbon:
+  ReadTimeout: 2000 
+  ConnectTimeout: 2000
+  
+whitelist:
+  ip-whites:
+    - 192.168.1.1
+    - 127.0.0.1
+    - 192.168.1.200
+    - 192.168.1.189
+    - 192.168.1.187
+
+system:
+  platform:
+    machineId: 1
+    name: cc

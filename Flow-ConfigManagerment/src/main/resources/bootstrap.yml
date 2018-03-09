@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: config-manager
+  cloud:
+    config:
+      uri: http://config-server:8762
+      profile: dev
+  aop:
+    proxy-target-class: true
+  
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: "jdbc:mysql://192.168.1.200:3306/blendplatform?useUnicode=true&characterEncoding=utf8"
+    #url: "jdbc:mysql://support.shziyuan.cn:53306/blendplatform?useUnicode=true&characterEncoding=utf8"
+    username: flowplatform
+    password: 940430Dex
+  data:
+    rest:
+      base-path: /datarest/
+    
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka/
+
+      
+server:
+  port: 8771
+ 
+  
+security:
+  oauth2:
+    client:
+      accessTokenUri: http://oauth2-server:8763/oauth/token
+      clientId: ldap
+      clientSecret: 940430
+      client-authentication-scheme: header
+      authentication-scheme: header
+      scope: web
+      authorized-grant-types: password
+    resource:
+      user-info-uri: http://oauth2-server:8763/me
+    sso:
+      filter-order: 3
+      

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.DistributorStatisticsSuccessMapper">
+	<!-- 分页查询产品信息 -->
+	<select id="selectTimeStatistics" resultType="com.ziyuan.web.manager.domain.DistributorSuccessStatistics" parameterType="map">
+		select * from blendplatform.distributor_success_statistics_daily 
+		<where>
+			<if test="distributor_name != null">
+				distributor_name = #{distributor_name}
+			</if>
+			<if test="startTime != null">
+			 and create_time &gt;= #{startTime}
+			</if>
+			<if test="endTime != null">
+			 and create_time &lt;= #{endTime}
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectDistinctDistributorName" resultType="string" parameterType="map">
+		select distinct distributor_name from blendplatform.distributor_success_statistics_daily
+		<where>
+			<if test="distributor_name != null">
+				distributor_name = #{distributor_name}
+			</if>
+		</where>
+	</select>
+	
+</mapper>

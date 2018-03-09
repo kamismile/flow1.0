@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ziyuan.web.manager.dao.InfoDistributorCertificateMapper">
+	<select id="selectByDistributorId" parameterType="int" resultType="infoDistributorCertificate">
+		select * from info_distributor_certificate where distributor_id=#{distributor_id}
+	</select>
+	
+	<select id="selectOne" parameterType="int" resultType="infoDistributorCertificate">
+		select * from info_distributor_certificate where distributor_id=#{id}
+	</select>
+	
+	<delete id="delete" parameterType="int">
+		delete from info_distributor_certificate where distributor_id=#{id}
+	</delete>
+	
+	<insert id="insert" parameterType="infoDistributorCertificate">
+		insert into info_distributor_certificate(distributor_id,filename,sourcename) values(#{distributor_id},#{filename},#{sourcename})
+	</insert>
+</mapper>

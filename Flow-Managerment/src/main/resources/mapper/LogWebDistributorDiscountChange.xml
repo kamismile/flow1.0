@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ziyuan.web.manager.dao.LogWebDistributorDiscountChangeMapper" >
+	
+	<select id="select" resultType="logWebDistributorDiscountChange" parameterType="map">
+		select * from log_web_distributor_discount_change
+		<where>
+			<if test="start != null">
+				insert_time &gt;= #{start}
+			</if>
+			<if test="end != null">
+				and insert_time &lt;= #{end}
+			</if>
+			<if test="distributor_id != null">
+				and distributor_id = #{distributor_id}
+			</if>
+		</where>
+		ORDER BY insert_time DESC
+	</select>
+	
+	<select id="export" resultType="logWebDistributorDiscountChange" parameterType="map">
+		select * from log_web_distributor_discount_change
+		<where>
+			<if test="start != null">
+				insert_time &gt;= #{start}
+			</if>
+			<if test="end != null">
+				and insert_time &lt;= #{end}
+			</if>
+			<if test="distributor_id != null">
+				and distributor_id = #{distributor_id}
+			</if>
+		</where>
+	</select>
+	
+	<insert id="insert" parameterType="logWebDistributorDiscountChange">
+		insert into log_web_distributor_discount_change(
+		insert_time,update_user,bind_id,distributor_id,distributor_name,sku_id,
+		sku_sku,sku_standard_price,before_discount,before_price,after_discount,
+		after_price,effective) 
+		values(#{insert_time},#{update_user},#{bind_id},#{distributor_id},#{distributor_name},#{sku_id},
+		#{sku_sku},#{sku_standard_price},#{before_discount},#{before_price},#{after_discount},
+		#{after_price},#{effective})
+	</insert>
+
+</mapper>

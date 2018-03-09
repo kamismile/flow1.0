@@ -1,0 +1,15 @@
+dn: uid=SaberAlter,ou=users,dc=shziyuan,dc=com
+changetype: add
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+mail: 380675200@qq.com
+mobile: 13805143214
+uid: SaberAlter
+sn: wang
+
+dn: cn=ROLE_USER,dc=oauth2,dc=shziyuan,dc=com
+changetype: modify
+add: memberUid
+memberUid: SaberAlter
