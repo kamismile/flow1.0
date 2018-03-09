@@ -1,0 +1,9 @@
+sms:
+  accessKeyId: LTAIJh76bX0XaeiM
+  accessKeySecret: 3vf9zRXgUDQwjCBcqwmDYuqeSWUumj
+  profile: cn-hangzhou
+
+messageType:
+  VERIFY_SUBMIT_ORDER: SMS_104260010
+  VERIFY_IMPORTANT: SMS_104470008
+  NOTIFY_PWD_CHANGED: SMS_104265010

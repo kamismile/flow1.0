@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: git
+  cloud:
+    config:
+      label: master
+      server:
+        git:
+          uri: http://support.shziyuan.cn:8001/FlowPlatform2/cloud-config.git
+          username: james.hu
+          password: 940430
+            
+  devtools:
+    restart:
+      additional-exclude:  svnWorkspace
+      
+# /refresh方法不需要进行认证
+management:
+  security:
+    enabled: false
+    
+server:
+  port: 8762
+ 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka/

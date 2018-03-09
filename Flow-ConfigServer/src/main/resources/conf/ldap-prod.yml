@@ -1,0 +1,4 @@
+ldap:
+ server : ldap://support.shziyuan.cn:389/
+ binder : test
+ password : test

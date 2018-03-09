@@ -1,0 +1,6 @@
+db:
+ driver: com.mysql.jdbc
+ url: 299384
+ username: flowplatform
+ password: 940430Dex
+ 
